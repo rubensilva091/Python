@@ -73,11 +73,77 @@ def ex11():
     print("a -> Produto do dobro do primeiro da metade do segundo: "+str(a) +
           "\nb -> A soma do triplo do primeiro com o terceiro: "+str(b)+"\nb -> O terceiro elevado ao cubo: "+str(c))
 
+
 def ex12():
-    
+    k = input("Digite a sua altura: ")
+    k = (72.7*k) - 58
+    print("O seu peso ideal é: "+str(k))
+
+
+def ex13():
+    k = float(input("Digite a sua altura: "))
+    k1 = (72.7*k) - 58
+    k2 = (62.1*k) - 44.7
+    print("O seu peso ideal é:\nHomem: "+str(k1)+"kg\nMulher: "+str(k2)+"kg")
+
+
+def ex14():
+    z = 0
+    peso = float(input("Digite o peso do peixe: "))
+    if (peso > 50):
+        price = 4*(int(peso-50))
+        z = 1
+    if(z != 0):
+        print("O excendete será taxado com: "+str(price)+"€")
+    else:
+        print("O peixe está dentro do preço!")
+
+
+def ex15():
+    k = float(input("Quanto voce ganha por hora?: "))
+    h = int(input("Quantas horas trabalhaste este mês?: "))
+    f = k*h
+    print("Salario bruto: "+str(f)+"€")
+    print("Imposto de habitação: "+str(f*0.11)+"€")
+    print("SNS: " + str(f*0.08)+"€")
+    print("Sindicato: " + str(f*0.05)+"€")
+    print("Salario Liquido: "+str(f*(1-0.11-0.08-0.05))+"€")
+
+
+def ex16():
+    m = float(input("Quanto metros quadrados são?: "))
+    z = m/3
+    k = z/18
+    if (k > (int(k))):
+        k += 1
+    print("É preciso " + str(int(k))+" latas de tinta")
+
+
+def ex17():  # Incompleto, não tenho paciencia
+    m = float(input("Quanto metros quadrados são?: "))
+    z = m/6
+    k1 = z/18
+    k2 = z/3.6
+    if (k2 > (int(k2))):
+        k2 += 1
+    price1 = k1*20
+    price2 = k2*6
+    print("É preciso " + str(int(k1)) +
+          " latas de tinta grandes com o custo de: "+str(price1)+"€")
+    print("É preciso " + str(int(k2)) +
+          " latas de tinta pequenas com o custo de: "+str(price2)+"€")
+
+
+def ex18():
+    sizeFile = int(input("Indique o tamanho do donwload em MB: "))
+    speed = int(input("Indique a velocidade da internet em MB/s: "))
+    f=sizeFile/speed
+    tempo_aux=(int(f/60))
+    print("O seu download demorará: "+str(tempo_aux)+" minutos e "+str(f-(tempo_aux*60)))
+
 
 def main():
-    ex11()
+    ex18()
 
 
 main()
