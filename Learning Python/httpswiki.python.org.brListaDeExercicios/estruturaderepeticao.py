@@ -122,18 +122,144 @@ def ex10():
 def ex11():
     k1 = int(input("Digite o numero inteiro 1: "))
     k2 = int(input("Digite o numero inteiro 2: "))
-    k=0
+    k = 0
     if(k2 < k1):
         aux = k1
         k1 = k2
         k2 = aux
     for i in range(k1+1, k2):
-        k=k+i
+        k = k+i
     print("O resultado da soma dos numeros entre o primeiro e o segundo é: "+str(k))
 
 
+def ex12():
+    k1 = int(input("Digite o numero inteiro para a tabuada: "))
+    print("\n\n\nTabuada do "+str(k1)+" :\n")
+    for i in range(10):
+        print(str(i+1)+" x " + str(k1) + " = "+str(k1*(i+1)))
+
+
+def ex13():
+    k1 = int(input("Digite a base: "))
+    k2 = int(input("Digite o expoente: "))
+    k = 0
+    for i in range(k2):
+        k = k1*(i+1)
+    print("O numero de "+str(k1)+"^"+str(k2)+" é: "+str(k))
+
+
+def ex14():
+    cPar = 0
+    cImpar = 0
+    for i in range(10):
+        k = int(input("Digite o numero "+str(i+1)+" : "))
+        if(k % 2 == 0):
+            cPar += 1
+        else:
+            cImpar += 1
+    print("Teve "+str(cPar)+" Pares!\nTeve "+str(cImpar)+" Impares!")
+
+
+def ex15():
+    n = int(input("Digite o n-th membro do fibonnaci: "))
+    a = 0
+    b = 1
+    if n < 0:
+        print("IMPOSSIVEL")
+    elif n == 0:
+        print("0")
+    elif n == 1:
+        print("1")
+    else:
+        for i in range(2, n):
+            c = a + b
+            a = b
+            b = c
+    print("FINAL: "+str(b))
+
+
+def ex16():
+    n = 10000
+    a = 0
+    b = 1
+    k = 0
+    if n < 0:
+        print("IMPOSSIVEL")
+    elif n == 0:
+        print("0")
+    elif n == 1:
+        print("1")
+    else:
+        for i in range(2, n):
+            c = a + b
+            a = b
+            b = c
+            if(b <= 500):
+                k = b
+            else:
+                break
+    print("FINAL: "+str(k))
+
+
+def ex17():
+    n = int(input("Digite qual numero deseja aplicar o fatorial: "))
+    k = 1
+    for i in range(1, n+1):
+        k = k*i
+    print("FINAL: "+str(k))
+
+
+def ex18():
+    n = int(input("Digite qual o tamanho da injecao numerica?: "))
+    k = 1
+    menor, maior = 999999999, 0
+    soma = 0
+    for i in range(n):
+        k = int(input("Digite o numero "+str(i+1)+" : "))
+        if (k < menor):
+            menor = k
+        if (k > maior):
+            maior = k
+        soma += k
+    print("MAIOR VALOR: "+str(maior)+"\nMENOR VALOR: " +
+          str(menor)+"\nSOMA: "+str(soma))
+
+
+def ex19():
+    n = int(input("Digite qual o tamanho da injecao numerica?: "))
+    k = 1
+    menor, maior = 999999999, 1
+    soma = 0
+    for i in range(n):
+        k = int(input("Digite o numero "+str(i+1)+" : "))
+        while (k < 0 or k > 1000):
+            k = int(input("NUMERO INVALO\nDIGITE OUTRA VEZ: "+str(i+1)+" : "))
+        if (k < menor):
+            menor = k
+        if (k > maior):
+            maior = k
+        soma += k
+    print("MAIOR VALOR: "+str(maior)+"\nMENOR VALOR: " +
+          str(menor)+"\nSOMA: "+str(soma))
+
+# nao percebi este....
+# def ex20():
+
+#verif
+def ex21():
+    k=int(input("Digite o numero que deseja verificar se é primo: "))
+    z=0
+    for i in range(k):
+        if((k%(i+1))==0 and (i+1)!=1):
+            z=1
+            print("Não é numero primo")
+            break
+    if (z==0):
+        print("É numero primo!")
+
+
 def main():
-    ex11()
+    ex21()
 
 
 main()
