@@ -352,11 +352,197 @@ def ex28():
     somatorio = somatorio/(i+1)
     print("Em media, o colecionador gastou: "+str(somatorio)+"€ ")
 
+
 def ex29():
-    
+    tabela = ""
+    for i in range(50):
+        k = int(input("Digite o preço do produto nr "+str(i+1)+(" : ")))
+        tabela = tabela + "Produto nr " + \
+            str(i+1) + " custa: " + str(k) + "€\n"
+    print("\n\n\nA TABELA DE PREÇOS\n")
+    print(tabela)
+
+
+def ex30():
+    k = int(input("Digite o preço do pão: "))
+    tabela = ""
+    for i in range(50):
+        tabela = tabela + "Nr de paes " + \
+            str(i+1) + " custa: " + str((i+1)*k) + "€\n"
+    print("\n\n\nA TABELA DE PREÇOS DE PAES\n")
+    print(tabela)
+
+
+def ex31():
+    k, i, soma = 1, 0, 0
+    while(k > 0):
+        i += 1
+        k = float(input("Digite o preço do produto nr "+str(i)+" : "))
+        if (k > 0):
+            soma = soma + k
+    print("TOTAL: "+str(soma)+"€")
+    p = float(input("Quanto irá pagar?: "))
+    print("Troco: "+str(p-soma) + "€")
+
+
+def ex32():
+    n = int(input("Fatorial: "))
+    string = ""
+    k = 1
+    for i in range(1, n+1):
+        string = string + str((n+1)-i)
+        k = k*i
+        if (i < n):
+            string = string + "."
+    print(str(n)+"!"+" = "+string + " = "+str(k))
+
+
+def ex33():
+    k = 1
+    i = 0
+    maior, menor = -99999999, 99999999
+    media = 0
+    while(k != 0):
+        i += 1
+        k = input("Digite a temperatura nr "+str(i)+" : ")
+        if (k < menor):
+            menor = k
+        if(k > maior):
+            maior = k
+        media = media+k
+    media = media/i
+    print("MAIOR Temperatura -> "+str(maior)+"\nMENOR Temperatura -> " +
+          str(menor)+"\nMEDIA Temperatura -> "+str(media))
+
+
+def ex34():
+    ex21(0)
+
+# Exercicios repetidos
+
+
+def ex35():
+    ex23()
+
+
+def ex36():
+    k = int(input("Montar a tabuada de: "))
+    b = int(input("Começar por: "))
+    t = int(input("Terminar em: "))
+    print("\nVou montar a tabuada de "+str(k) +
+          " começando em "+str(b)+" e terminando em "+str(t)+":")
+    for b in range(b, t+1):
+        print(str(k)+" X "+str(b)+" = " + str(b*k))
+
+
+def ex37():
+    k, i = 1, 1
+    magroV, pesadoV, altoV, baixoV = 40000, -40000, -100000, 10000
+    magro, pesado, alto, baixo = "", "", "", ""
+    while(k):
+        k = input("Digite o codigo do cliente nr "+str(i)+" : ")
+        if(k == "0"):
+            break
+        peso = float(input("Digite o peso do cliente nr "+str(i)+" : "))
+        altura = float(input("Digite a altura do cliente nr "+str(i)+" : "))
+        if (peso < magroV):
+            magroV = peso
+            magro = k + " -> Com peso: " + \
+                str(peso) + " e altura: "+str(altura)
+        if (peso > pesadoV):
+            pesadoV = peso
+            pesado = k + " -> Com peso: " + \
+                str(peso) + " e altura: "+str(altura)
+        if (altura > altoV):
+            altoV = altura
+            alto = k + " -> Com peso: " + str(peso) + " e altura: "+str(altura)
+        if (altura < baixoV):
+            baixoV = altura
+            baixo = k + " -> Com peso: " + \
+                str(peso) + " e altura: "+str(altura)
+        i += 1
+    print("O MAIS MAGRO: "+magro+"\nO MAIS PESADO: " + pesado +
+          "\nO MAIS ALTO: " + alto + "\nO MAIS BAIXO: "+baixo)
+
+
+def ex38():
+    k = int(input("Insira o salário do funcionario: "))
+    data = int(input("Digite o ano que deseja saber (1995+): ")) - 1995
+    perc = 0.015
+    for i in range(data):
+        k = k + (k*perc)
+        perc = perc * 2
+    print("O salario atual do funcionario é : " + str(k))
+
+# praticamente igual ao ex 37
+# def ex39():
+
+# praticamente igual ao ex 37 só com cidades
+# def ex40():
+
+# nao percebi
+# def ex41():
+
+
+def ex42():
+    k = 1
+    _025 = 0
+    _2650 = 0
+    _5175 = 0
+    _76100 = 0
+    while(k >= 0):
+        k = (int(input("Digite os numeros positivos: ")))
+        if(k >= 0 and k <= 25):
+            _025 += 1
+        if(k >= 0 and k <= 25):
+            _2650 = 1
+        if(k >= 0 and k <= 25):
+            _5175 += 1
+        if(k >= 0 and k <= 25):
+            _76100 += 1
+    print("\n[0,25] -> " + str(_025)+"\n[26,50] -> "+str(_2650) +
+          "\n[51,75] -> "+str(_5175)+"\n[76,100] -> "+str(_76100))
+
+# praticamente igual ao ex 30 só com hamburgaria
+# def ex43()
+
+
+def ex44():
+    k, i = 1, 0
+    ruiben, salomao, gary, branco, nulo = 0, 0, 0, 0, 0
+    total = 0
+    while(k != 0):
+        i += 1
+        k = input(
+            "OLA ELEITOR nr "+str(i)+"\nDigite qual o deputado\n1->Ruiben\n2->Salomão\n3->Gary\n0->SAIR\nQUAL: ")
+        if(k == "0"):
+            break
+        if (k == "1"):
+            ruiben += 1
+        if (k == "2"):
+            salomao += 1
+        if (k == "3"):
+            gary += 1
+        if (k == None):
+            branco += 1
+        if (k != "1" and k != "2" and k != "3"):
+            nulo += 1
+        total += 1
+    print("=====RESULTADO FINAL=====")
+    print("\nRUIBEN -> "+str(ruiben))
+    print("\nSALOMÃO -> "+str(salomao))
+    print("\nGARY -> "+str(gary))
+    print("\nBRANCO -> "+str(branco))
+    print("\nNULO -> "+str(nulo))
+    print("\n\nOuve "+str(nulo/total)+" votos anulados!")
+    print("Ouve "+str(branco/total)+" votos em branco!")
+    print("\n")
+
+def ex45():
+    print("LETS GO")
 
 def main():
-    ex28()
+    ex44()
 
 
 main()
