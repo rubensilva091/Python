@@ -538,11 +538,100 @@ def ex44():
     print("Ouve "+str(branco/total)+" votos em branco!")
     print("\n")
 
+
 def ex45():
-    print("LETS GO")
+    k = ""
+    string = ""
+    resposta = []
+    k, media, counter = 1, 0, 0
+    menor, maior = 90000, -90000
+    maiorNota, menorNota = "", ""
+    for i in range(10):
+        resposta.append(input("PROF -> Digite a resposta nr "+str(i+1)+" : "))
+    while(k):
+        k = int(input(
+            "Digite 1 para passar ao aluno seguinte\nPressione outra tecla para sair: "))
+        if(k != 1):
+            break
+        nota = 0
+        nome = input("Digite o nome seu nome!: ")
+        for i in range(10):
+            res = input("Digite a resposta da pergunta "+str(i+1)+" : ")
+            if (resposta[i] == res):
+                nota += 1
+        if (nota > maior):
+            maior = nota
+            maiorNota = "Aluno com maior nota: " + \
+                nome+" com nota de : "+str(nota)
+        if (nota < menor):
+            menor = nota
+            menorNota = "Aluno com menor nota: " + \
+                nome+" com nota de : "+str(nota)
+        media = media+nota
+        string = string + nome + " obteve: " + str(nota)+"\n"
+        counter += 1
+    print("\n==========TABELA==========\n\n"+string)
+    print(maiorNota)
+    print("\n"+menorNota)
+    print("\nA media da turma foi: "+str(media/counter) +
+          " respostas acertadas por 10 alineas")
 
-def main():
-    ex44()
+
+def ex46():
+    k = 1
+    melhorTodos = 0
+    melhorAtleta = ""
+    tabelafinal = ""
+    ordenacao = ["Primeiro", "Segundo", "Terceiro", "Quarto", "Quinto"]
+    while(k):
+        k = input("Digite 1 se quiser continuar\nDigite outra tecla para sair: ")
+        if(k != "1"):
+            break
+        media = 0
+        melhorSalto, piorSalto = 0, 90000
+        nome = input("Digite o nome do atleta: ")
+        tabelafinal = tabelafinal + "\n\nAtleta: "+nome + "\n\n"
+        for i in range(5):
+            salto = float(input(ordenacao[i]+" salto: "))
+            media = media + salto
+            if (salto < piorSalto):
+                piorSalto = salto
+            if (salto > melhorSalto):
+                melhorSalto = salto
+            tabelafinal = tabelafinal + \
+                ordenacao[i] + " salto: " + str(salto)+" m\n"
+        if ((media/5) > melhorTodos):
+            melhorTodos = media/5
+            melhorAtleta = "O melhor atleta foi " + \
+                nome+" com "+str(media/5)+" m"
+        tabelafinal = tabelafinal + "\nMelhor Salto: " + str(melhorSalto) + \
+            " m\nPior Salto: " + \
+            str(piorSalto)+" m\nMedia dos Saltos: " + str(media) + " m\n"
+    print(tabelafinal)
+    print(melhorAtleta)
+
+# praticamente igual ao exercicio anterior
+# def ex47():
 
 
-main()
+def ex48():
+    k = input("Digite o numero ou palavra que pretende inverter: ")
+    final = ""
+    for i in k:
+        final = final + i
+    print("\n"+final)
+
+# nao entendi
+# def ex49():
+
+# parece ser analogo ao 49
+# def ex50():
+
+# analogo ao 49
+# def ex51():
+
+# def main():
+    # ex48()
+
+
+# main()
