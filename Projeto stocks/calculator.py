@@ -2,6 +2,7 @@ from tkinter import *
 import tkinter.font
 from tkinter import messagebox
 import math
+import grafico
 
 
 def fontConfig(n):
@@ -153,18 +154,17 @@ withdrawLabelLabel.place(x=14, y=363)
 
 # Butao Calcular
 butaoCalcular = Button(window, text="Calcular", bd='5',
-                       command=lambda: calcular(window))
+                       command=lambda: calcular(0))
 butaoCalcular.place(x=315, y=485)
 
 #Butão Grafico
 
 butaoGrafico = Button(window,text="Grafico", bd='5',
-                       command=lambda: calcular(window))
+                       command=lambda: calcular(1))
 butaoGrafico.place(x=315, y=530)
 
 
-def calcular(window):
-    moeda = 1  # EURO
+def calcular(n1):
     p = int(balancoInicial.get())
     r = int(interestRate.get())/100
     t = int(timeYear.get())
@@ -178,15 +178,17 @@ def calcular(window):
         (int(withdraw.get())*leropcaoWithdraw())
     # Formula da inflação anual
     #moeda = (moeda*(1+(t*a)-moeda)/moeda*(1+(t*a)))
-    print(moeda)
     eq = (math.pow((1+(r/n)), (n*t)))
     # Formula final investimento inicial  -> A = P(1+r/n)^nt
     final1 = 1*(p*eq)
     # Formula final depositos regulares -> A = (PMT(1+r/n)^nt)/(r/n)
     final2 = pmt*(eq-1)/(r/n)
     final = final1 + final2
-    finalTotalVAR.set(str(round(final, 2))+" €")
-    finalTotalVARIR.set(str(round(final-p-(pmt*t*12), 2))+" €")
+    if (n1==0):
+        finalTotalVAR.set(str(round(final, 2))+" €")
+        finalTotalVARIR.set(str(round(final-p-(pmt*t*12), 2))+" €")
+    if (n1==1):
+        grafico.graphFunction(p,r,n,t,pmt)
 
 
 def leropcaoIR():
