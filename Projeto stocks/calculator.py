@@ -16,7 +16,7 @@ window.title("Comp. Int. Calculator")
 window.configure(bg='lightgrey')
 window.geometry("400x700")
 window.resizable(width=False, height=False)
-window.iconbitmap("assets/logo.ico")
+#window.iconbitmap("logo.ico")
 
 # Labels
 titulo = Label(window, text="Calculator",
@@ -254,5 +254,3 @@ def leropcaoWithdraw():
 
 
 window.mainloop()
-
-k=input("press close to exit") 

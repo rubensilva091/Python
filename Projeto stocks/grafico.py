@@ -10,8 +10,8 @@ import numpy as np
 
 def graphFunction(p,r,n,t,pmt):
     window = Tk()
-    window.wm_title("Grafico de Crescimento")
-    window.iconbitmap("assets/logo.ico")
+    window.title("Grafico de Crescimento")
+    #window.iconbitmap("logo.ico")
     window.resizable(width=False, height=False)
     window.geometry("600x500")
 
