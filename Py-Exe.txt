@@ -1,0 +1,15 @@
+PyInstaller
+
+pyinstaller --onefile main.py
+
+pyinstaller -c -F calculator.py 
+
+pyinstaller -c -F calculator.py --windowed     (sem consola)
+
+
+
+Auto Py   (prefiro este)
+
+pip install auto-py-to-exe
+
+auto-py-to-exe
