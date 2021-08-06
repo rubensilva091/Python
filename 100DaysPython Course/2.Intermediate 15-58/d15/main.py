@@ -62,7 +62,7 @@ def coffemachine():
             "What would you like? (espresso/latte/cappuccino): ").lower()
         if (request == "off"):
             break
-        while(request != "cappuccino" and request != "espresso" and request != "latte" and request != "off"):
+        while(request != "cappuccino" and request != "espresso" and request != "latte" and request != "off" and request != "report"):
             request = input(
                 "That doesnt exist, please type the following options? (espresso/latte/cappuccino): ").lower()
         money += process(request, money)
