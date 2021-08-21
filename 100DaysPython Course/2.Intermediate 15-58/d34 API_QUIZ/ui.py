@@ -1,0 +1,3 @@
+THEME_COLOR = "#375362"
+pass
+
