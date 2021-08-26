@@ -1,0 +1,123 @@
+#main_title
+{
+  font-family: "Brush Script MT", cursive;
+  font-size: 80px;
+  color:#3DB2FF;
+  text-shadow: 1px 2px #387ba8;
+  padding-top: 40px;
+  padding-top: 20px;
+  text-align: center;
+  
+}
+
+.cima
+{
+  background-color: #FFB830;
+  position: absolute;
+  bottom: 0;
+  right: 20px;
+  left: 50px;
+  top: 30px;
+}
+
+.python_logo
+{
+  height: 400px;
+  width: 800px;
+  position: relative;
+  display: block;
+  margin-top: 5%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.c_logo
+{
+  height: 270px;
+  width: 250px;
+  position: absolute;
+  top: 550px;
+  left: 150px;
+}
+
+.js_html_css_logo
+{
+  position: absolute;
+  height: 250px;
+  width: 350px;
+  top: 570px;
+  right: 150px;
+}
+
+.quote1
+{
+  font-family: "Brush Script MT", cursive;
+  font-size: 40px;
+  color:#3DB2FF;
+  text-shadow: 1px 2px #387ba8;
+  padding-top: 40px;
+  padding-top: 20px;
+  text-align: center;
+}
+
+.background_photo
+{
+  margin: 0;
+  opacity: 0.5;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+
+.circle
+{
+  height: 400px;
+  width: 400px;
+  background-color: #FFB830;
+  border-radius: 50%;
+  position: absolute;
+  top: 1050px;
+  left: 100px;
+  z-index: 1;
+}
+
+.logo
+{
+  height: 360px;
+  width: 360px;
+  display: flex;
+  margin-top: 5%;
+  margin-left: auto;
+  margin-right: auto;
+  z-index: 2;
+}
+
+.text_box
+{
+  height: 450px;
+  width: 800px;
+  background-color: #FFB830;
+  position: absolute;
+  top: 1000px;
+  left: 45%;
+  z-index: 1;
+}
+
+.circle:hover
+{
+  background-color: #3DB2FF;
+  color:#FFB830;
+  text-shadow: 1px 2px #FFB830;
+}
+
+.frase
+{
+  font-family: "Brush Script MT", cursive;
+  font-size: 80px;
+  color:#3DB2FF;
+  text-shadow: 1px 2px #387ba8;
+  margin: 0,auto;
+  text-align: center;
+}
