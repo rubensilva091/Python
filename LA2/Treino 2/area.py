@@ -36,16 +36,16 @@ def area(p, mapa):
             if (t, i) not in grafo_mapa.items():
                 grafo_mapa[(t, i)] = set()
             if(t+1 < x):
-                if (mapa[t+1][i] != "*"):
+                if (mapa[i][t+1] != "*"):
                     grafo_mapa[(t, i)].add((t+1, i))
             if(t-1 >= 0):
-                if (mapa[t-1][i] != "*"):
+                if (mapa[i][t-1] != "*"):
                     grafo_mapa[(t, i)].add((t-1, i))
             if(i+1 < y):
-                if (mapa[t][i+1] != "*"):
+                if (mapa[i+1][t] != "*"):
                     grafo_mapa[(t, i)].add((t, i+1))
             if(i-1 >= 0):
-                if (mapa[t][i-1] != "*"):
+                if (mapa[i-1][t] != "*"):
                     grafo_mapa[(t, i)].add((t, i-1))
     # BFS
     queue = [p]
@@ -62,7 +62,7 @@ def area(p, mapa):
     return len(path)
 
 
-print(area((-4, 3), mapa3))
+print(area((3, 2), mapa2))
 
 
 # self.assertEqual(area((3,2),mapa1),5)
