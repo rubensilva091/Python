@@ -3,9 +3,9 @@ Implemente uma função que calcula a área de um mapa que é acessível por
 um robot a partir de um determinado ponto.
 O mapa é quadrado e representado por uma lista de strings, onde um '.' representa
 um espaço vazio e um '*' um obstáculo.
-O ponto inicial consistirá nas coordenadas horizontal e vertical, medidas a 
+O ponto inicial consistirá nas coordenadas horizontal e vertical, medidas a
 partir do canto superior esquerdo.
-O robot só consegue movimentar-se na horizontal ou na vertical. 
+O robot só consegue movimentar-se na horizontal ou na vertical.
 '''
 
 mapa1 = ["..*..",
@@ -25,44 +25,35 @@ mapa3 = ["..", ".."]
 
 
 def area(p, mapa):
-    if (p[0] <0 or p[1]<0):
-        return 0
-    # obter as variaveis iniciais para construir o grafo
-    x, y = len(mapa[0]), len(mapa)
-    grafo_mapa = {}
-    # construir o grafo
-    for i in range(y):
-        for t in range(x):
-            if (t, i) not in grafo_mapa.items():
-                grafo_mapa[(t, i)] = set()
-            if(t+1 < x):
-                if (mapa[i][t+1] != "*"):
-                    grafo_mapa[(t, i)].add((t+1, i))
-            if(t-1 >= 0):
-                if (mapa[i][t-1] != "*"):
-                    grafo_mapa[(t, i)].add((t-1, i))
-            if(i+1 < y):
-                if (mapa[i+1][t] != "*"):
-                    grafo_mapa[(t, i)].add((t, i+1))
-            if(i-1 >= 0):
-                if (mapa[i-1][t] != "*"):
-                    grafo_mapa[(t, i)].add((t, i-1))
-    # BFS
+    moves = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+    adj = {}
     queue = [p]
-    visited = {p}
-    path = {}
-    path[p] = p
+    vis = {p}
+    pai = {}
     while(queue):
-        node = queue.pop(0)
-        for new_node in grafo_mapa[node]:
-            if new_node not in visited:
-                visited.add(new_node)
-                path[new_node] = node
-                queue.append(new_node)
-    return len(path)
+        # Aceder à stack e extrair a primeira variavel
+        v = queue.pop(0)
+        if v not in adj:
+            adj[v] = set()
+
+        # Adicionar as edges à variavel
+        for m in moves:
+            if(v[1]+m[1] >= 0 and v[1]+m[1] < len(mapa) and v[0]+m[0] >= 0 and v[0]+m[0] < len(mapa[0])):
+                if (mapa[v[1]+m[1]][v[0]+m[0]] != "*"):
+                    adj[v].add((v[0]+m[0], v[1]+m[1]))
+
+        # Percorrer todas as Edges da variavel
+        for d in adj[v]:
+            if d not in vis:
+                vis.add(d)
+                pai[d] = v
+                queue.append(d)
+
+    #Area+1 pois a origem nao esta a ser contabilizada inicialmente
+    return len(pai)+1
 
 
-print(area((3, 2), mapa2))
+print(area((3, 2), mapa1))
 
 
 # self.assertEqual(area((3,2),mapa1),5)

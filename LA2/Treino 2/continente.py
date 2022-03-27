@@ -9,56 +9,41 @@ vizinhos1 = [["Portugal", "Espanha"], ["Espanha", "França"], [
     "França", "Bélgica", "Alemanha", "Luxemburgo"], ["Canada", "Estados Unidos"]]
 vizinhos2 = [["Portugal", "Espanha"], ["Espanha", "França"]]
 vizinhos3 = [["Portugal"], ["Alemanha"]]
-vizinhos4 = []
 
-
-def bfs_continente(adj):
-    final_pai = []
-    for o in adj.keys():
-        queue = [o]
-        vis = {o}
-        pai = {}
-        while(queue):
-            v = queue.pop(0)
-            for d in adj[v]:
-                if d not in vis:
-                    vis.add(d)
-                    pai[d] = v
-                    queue.append(d)
-        final_pai.append(pai)
-    return final_pai
-
+def bfs(adj, o):
+    queue = [o]
+    vis = {o}
+    pai = {}
+    while(queue):
+        v = queue.pop(0)
+        for d in adj[v]:
+            if d not in vis:
+                vis.add(d)
+                pai[d] = v
+                queue.append(d)
+    return pai
 
 def maior(vizinhos):
     adj = {}
-    for fronteira in vizinhos:
-        # sem esta linha de codigo toda FODIDA e completamente errada logicamente, o programa da 60%
-        # Isto é, por causa da minha iteraçao, se existir fronteiras com 1 ou menos, FUDEU, nao vai iterar,
-        # Logo, meti qualquer merda dentro da adj[fronteira[0]] e ficou a funcionar, Whatever
-        if len(fronteira) == 1:
-            print(fronteira)
-            adj[fronteira[0]] = fronteira
+    #Gerar o grafo de fronteiras
+    for continente in vizinhos:
+        for pais in continente:
+            for i in range(len(continente)):
+                if pais not in adj:
+                    adj[pais] = set()
+                if pais != continente[i]:
+                    adj[pais].add(continente[i])
 
-        # De resto, está cleanzaçooo (jk, isto está javardo pra caralho)
-        for i in range(len(fronteira)-1):
-            if fronteira[i] not in adj:
-                adj[fronteira[i]] = set()
-            if fronteira[i+1] not in adj:
-                adj[fronteira[i+1]] = set()
-            adj[fronteira[i]].add(fronteira[i+1])
-            adj[fronteira[i+1]].add(fronteira[i])
+    #Obter o maior continente
+    maior=0
+    for p in adj:
+        n= len(bfs(adj,p)) +1
+        if(n>maior):
+            maior=n
 
-    path = bfs_continente(adj)
-    # ordernar todos PELA quantidade de edges, assim obtemos Na primeira posiçao um continente qualquer, mas que contem o maior nr de edges
-    path = sorted(path, key=lambda i: -len(i))
-
-    # Pode ser vazio, logo, nao path[0] nao existe e FODEU
-    final_path = 0
-    if path:
-        final_path = len(path[0])+1
-    return final_path
+    return maior
 
 
-print(maior(vizinhos4))
+print(maior(vizinhos2))
 #self.assertEqual(maior(vizinhos), 6)
 #self.assertEqual(maior(vizinhos), 3)
