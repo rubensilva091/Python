@@ -51,7 +51,5 @@ def erdos(artigos, n):
     final = [k1 for k1, v1 in sorted(pai.items(), key=lambda i:(i[1], i[0])) if v1 <=n]
     return final
 
-
-print(erdos(artigos1, 2))
 #self.assertEqual(erdos(artigos,2),['Paul Erdos', 'Nati Linial', 'Ron Aharoni', 'Benny Sudakov', 'Eli Gafni', 'Uriel Feige', 'Yakov Babichenko', 'Yehuda Afek'])
 #self.assertEqual(erdos(artigos,1),['Paul Erdos', 'Nati Linial', 'Ron Aharoni'])

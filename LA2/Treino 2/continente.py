@@ -43,7 +43,5 @@ def maior(vizinhos):
 
     return maior
 
-
-print(maior(vizinhos2))
 #self.assertEqual(maior(vizinhos), 6)
 #self.assertEqual(maior(vizinhos), 3)

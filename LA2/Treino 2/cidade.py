@@ -64,8 +64,5 @@ def tamanho(ruas):
         final.append(aux)
     return max(final)
 
-
-tamanho(ruas1)
-
 # self.assertEqual(tamanho(ruas1),25)
 # self.assertEqual(tamanho(ruas2),4)

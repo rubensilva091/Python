@@ -52,9 +52,5 @@ def area(p, mapa):
     #Area+1 pois a origem nao esta a ser contabilizada inicialmente
     return len(pai)+1
 
-
-print(area((3, 2), mapa1))
-
-
 # self.assertEqual(area((3,2),mapa1),5)
 # self.assertEqual(area((3,2),mapa2),12)

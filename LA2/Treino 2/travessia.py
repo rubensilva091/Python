@@ -27,61 +27,57 @@ mapa3 = ["000",
          "111"]
 
 
-
-def floyd_warshall(adj):
-    dist = {}
-    for o in adj:
-        dist[o] = {}
-        for d in adj:
-            if o == d:
-                dist[o][d] = 0
-            elif d in adj[o]:
-                dist[o][d] = adj[o][d]
-            else:
-                dist[o][d] = float("inf")
-    for k in adj:
-        for o in adj:
-            for d in adj:
-                if dist[o][k] + dist[k][d] < dist[o][d]:
-                    dist[o][d] = dist[o][k] + dist[k][d]
-    return dist
-
-
 def travessia(mapa):
+    final=[]
     moves = [(1, 0), (0, 1), (-1, 0), (0, -1)]
-    adj = {}
 
-    # Obter o grafo
-    for y in range(len(mapa)):
-        for x in range(len(mapa[0])):
-            if (x, y) not in adj:
-                adj[(x, y)] = {}
+    #Fazer a travessia em cada ponto da primeira linha
+    for i in range(len(mapa[0])):
+        adj = {}
+        pai = {}
+        dist = {}
+        o = (i, 0)
+        dist[o] = 0
+        orla = {o}
+        while orla:
+            v = min(orla, key=lambda x: dist[x])
+            orla.remove(v)
+            if v not in adj:
+                adj[v] = {}
 
-            # tdo o calculo necessario para o grafo
+            # Criar as edges
             for m in moves:
-                if(x+m[0] >= 0 and x+m[0] < len(mapa[0]) and y+m[1] >= 0 and y+m[1] < len(mapa)):
-                    new_n = abs(int(mapa[y][x])-int(mapa[y+m[1]][x+m[0]]))
-                    if(new_n <= 2):
-                        adj[(x, y)][(x+m[0], y+m[1])] = new_n + 1
+                new_X = v[0]+m[0]
+                new_Y = v[1]+m[1]
+                new_coord = (new_X, new_Y)
+                if (new_X >= 0 and new_X < len(mapa[0]) and new_Y >= 0 and new_Y < len(mapa)):
+                    altura = abs(int(mapa[v[1]][v[0]])-int(mapa[new_Y][new_X]))
+                    if new_X<i and new_Y==0:
+                        altura=99
+                    if(altura <= 2):
+                        adj[v][new_coord] = altura+1
+                            
 
-    final = []
-    r = 9999999
-    path = floyd_warshall(adj)
-    size = len(mapa[0])
+            # Percorrer as edges
+            for d in adj[v]:
+                if d not in dist:
+                    orla.add(d)
+                    dist[d] = float("inf")
+                if dist[v] + adj[v][d] < dist[d]:
+                    pai[d] = v
+                    dist[d] = dist[v] + adj[v][d]
 
-    # COMO PERCORRER O OUTPUT DO FLOYD WARSHELL
-    for origem in range(size):
-        for destino in range(size):
-            if path[(origem, 0)][(destino, y)] <= r:
-                r = path[(origem, 0)][(destino, y)]
+        #Obter a coordenada mais a oeste
+        aux=[]
+        for ((v1,v2),v3) in dist.items():
+            if v2==len(mapa)-1:
+                aux.append((i,v1,v2, v3))
+        if len(aux)>0:
+            final.append(sorted(aux, key=lambda i:(i[3],i[1])).pop(0))
 
-                o = (origem, r)
+    #Criar a variavel final
+    final=sorted(final, key=lambda i:(i[3],i[1])).pop(0)
+    return (final[0],final[3])
 
-                final.append(o)
-    final = sorted(final, key=lambda i: (i[1], i[0]))[0]
-    return final
-
-
-print(travessia(mapa1))
 # self.assertEqual(travessia(mapa1),(2,10))
 # self.assertEqual(travessia(mapa2),(1,5))
