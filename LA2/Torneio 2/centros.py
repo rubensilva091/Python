@@ -25,6 +25,7 @@ arestas1 = ["a5b", "b10c", "c4d", "a20d"]
 arestas2 = ["a5b", "b10c", "c4d", "a20d", "e5f"]
 arestas3 = ["ab"]
 
+#Javardei isto  de uma maneira
 def dijkstra(adj, o):
     dist = {}
     dist[o] = 0
@@ -58,7 +59,9 @@ def centros(arestas):
 
         adj[r[0]][r[-1]] = min(int(r[1:len(r)-1]), adj[r[0]][r[-1]])
         adj[r[-1]][r[0]] = min(int(r[1:len(r)-1]), adj[r[-1]][r[0]])
-
+    
+    
+    #Daqui pra baixo é um crime
     maior = float("inf")
     maior_var = ""
     aux_final = []
