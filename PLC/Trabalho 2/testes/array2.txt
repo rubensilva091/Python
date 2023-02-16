@@ -1,0 +1,9 @@
+{
+    Main
+
+    int array1[10] = 5,10,15,20,25,30,35,40,45,50
+    int array2[2] = 50,80
+
+    Print(array2[1])
+    Read array1
+}

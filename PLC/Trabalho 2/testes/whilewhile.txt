@@ -1,0 +1,18 @@
+{
+    Main 
+    int i = 5
+    int j = 2
+    int resultado 
+
+    While (i < 7) Do {
+        	
+        While ( j < 4) Do{
+
+            j = j + 1
+        }
+
+        i = i + 1
+    }
+
+    resultado = i+j
+}

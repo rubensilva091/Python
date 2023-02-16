@@ -1,0 +1,2253 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> program
+Rule 1     program -> { MAIN body }
+Rule 2     body -> declarations commands
+Rule 3     declarations -> <empty>
+Rule 4     declarations -> declaration declarations
+Rule 5     declaration -> INT ID
+Rule 6     declaration -> INT ID = NUM
+Rule 7     commands -> <empty>
+Rule 8     commands -> command commands
+Rule 9     command -> cmd_prints
+Rule 10    cmd_prints -> PRINT ( cmd_print prints )
+Rule 11    prints -> + cmd_print prints
+Rule 12    prints -> <empty>
+Rule 13    cmd_print -> Id
+Rule 14    cmd_print -> STR
+Rule 15    command -> cmd_read
+Rule 16    cmd_read -> READ Id
+Rule 17    command -> cmd_if
+Rule 18    cmd_if -> IF condition { commands }
+Rule 19    command -> cmd_if_else
+Rule 20    cmd_if_else -> IF condition { commands } ELSE { commands }
+Rule 21    command -> attribution
+Rule 22    attribution -> Id = exp
+Rule 23    command -> cmd_while
+Rule 24    cmd_while -> WHILE condition DO { commands }
+Rule 25    condition -> ( context )
+Rule 26    condition -> NOT ( context )
+Rule 27    condition -> condition AND condition
+Rule 28    condition -> condition OR condition
+Rule 29    context -> exp EQUALS exp
+Rule 30    context -> exp > exp
+Rule 31    context -> exp < exp
+Rule 32    context -> exp GREATERQ exp
+Rule 33    context -> exp LESSERQ exp
+Rule 34    context -> condition
+Rule 35    exp -> exp + term
+Rule 36    exp -> exp - term
+Rule 37    exp -> term
+Rule 38    term -> term / factor
+Rule 39    term -> term * factor
+Rule 40    term -> term % factor
+Rule 41    term -> factor
+Rule 42    factor -> NUM
+Rule 43    factor -> Id
+Rule 44    Id -> ID
+Rule 45    values -> NUM , values
+Rule 46    values -> NUM
+Rule 47    values -> <empty>
+Rule 48    declaration -> INT ID [ NUM ]
+Rule 49    declaration -> INT ID [ NUM ] = values
+Rule 50    cmd_print -> ID_Array
+Rule 51    cmd_read -> READ ID_Array
+Rule 52    factor -> ID_Array
+Rule 53    context -> exp
+Rule 54    command -> ID_Array = exp
+Rule 55    ID_Array -> ID [ factor ]
+Rule 56    d_values -> [ values ] d_values
+Rule 57    d_values -> <empty>
+Rule 58    declaration -> INT ID [ NUM ] [ NUM ]
+Rule 59    declaration -> INT ID [ NUM ] [ NUM ] = d_values
+Rule 60    command -> ID_Double_Array = exp
+Rule 61    cmd_print -> ID_Double_Array
+Rule 62    cmd_read -> ID_Double_Array
+Rule 63    factor -> ID_Double_Array
+Rule 64    ID_Double_Array -> ID [ factor ] [ factor ]
+
+Terminals, with rules where they appear
+
+%                    : 40
+(                    : 10 25 26
+)                    : 10 25 26
+*                    : 39
++                    : 11 35
+,                    : 45
+-                    : 36
+/                    : 38
+<                    : 31
+=                    : 6 22 49 54 59 60
+>                    : 30
+AND                  : 27
+DO                   : 24
+ELSE                 : 20
+EQUALS               : 29
+GREATERQ             : 32
+ID                   : 5 6 44 48 49 55 58 59 64
+IF                   : 18 20
+INT                  : 5 6 48 49 58 59
+LESSERQ              : 33
+MAIN                 : 1
+NOT                  : 26
+NUM                  : 6 42 45 46 48 49 58 58 59 59
+OR                   : 28
+PRINT                : 10
+READ                 : 16 51
+STR                  : 14
+WHILE                : 24
+[                    : 48 49 55 56 58 58 59 59 64 64
+]                    : 48 49 55 56 58 58 59 59 64 64
+error                : 
+{                    : 1 18 20 20 24
+}                    : 1 18 20 20 24
+
+Nonterminals, with rules where they appear
+
+ID_Array             : 50 51 52 54
+ID_Double_Array      : 60 61 62 63
+Id                   : 13 16 22 43
+attribution          : 21
+body                 : 1
+cmd_if               : 17
+cmd_if_else          : 19
+cmd_print            : 10 11
+cmd_prints           : 9
+cmd_read             : 15
+cmd_while            : 23
+command              : 8
+commands             : 2 8 18 20 20 24
+condition            : 18 20 24 27 27 28 28 34
+context              : 25 26
+d_values             : 56 59
+declaration          : 4
+declarations         : 2 4
+exp                  : 22 29 29 30 30 31 31 32 32 33 33 35 36 53 54 60
+factor               : 38 39 40 41 55 64 64
+prints               : 10 11
+program              : 0
+term                 : 35 36 37 38 39 40
+values               : 45 49 56
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . program
+    (1) program -> . { MAIN body }
+
+    {               shift and go to state 2
+
+    program                        shift and go to state 1
+
+state 1
+
+    (0) S' -> program .
+
+
+
+state 2
+
+    (1) program -> { . MAIN body }
+
+    MAIN            shift and go to state 3
+
+
+state 3
+
+    (1) program -> { MAIN . body }
+    (2) body -> . declarations commands
+    (3) declarations -> .
+    (4) declarations -> . declaration declarations
+    (5) declaration -> . INT ID
+    (6) declaration -> . INT ID = NUM
+    (48) declaration -> . INT ID [ NUM ]
+    (49) declaration -> . INT ID [ NUM ] = values
+    (58) declaration -> . INT ID [ NUM ] [ NUM ]
+    (59) declaration -> . INT ID [ NUM ] [ NUM ] = d_values
+
+    PRINT           reduce using rule 3 (declarations -> .)
+    READ            reduce using rule 3 (declarations -> .)
+    IF              reduce using rule 3 (declarations -> .)
+    WHILE           reduce using rule 3 (declarations -> .)
+    ID              reduce using rule 3 (declarations -> .)
+    }               reduce using rule 3 (declarations -> .)
+    INT             shift and go to state 7
+
+    body                           shift and go to state 4
+    declarations                   shift and go to state 5
+    declaration                    shift and go to state 6
+
+state 4
+
+    (1) program -> { MAIN body . }
+
+    }               shift and go to state 8
+
+
+state 5
+
+    (2) body -> declarations . commands
+    (7) commands -> .
+    (8) commands -> . command commands
+    (9) command -> . cmd_prints
+    (15) command -> . cmd_read
+    (17) command -> . cmd_if
+    (19) command -> . cmd_if_else
+    (21) command -> . attribution
+    (23) command -> . cmd_while
+    (54) command -> . ID_Array = exp
+    (60) command -> . ID_Double_Array = exp
+    (10) cmd_prints -> . PRINT ( cmd_print prints )
+    (16) cmd_read -> . READ Id
+    (51) cmd_read -> . READ ID_Array
+    (62) cmd_read -> . ID_Double_Array
+    (18) cmd_if -> . IF condition { commands }
+    (20) cmd_if_else -> . IF condition { commands } ELSE { commands }
+    (22) attribution -> . Id = exp
+    (24) cmd_while -> . WHILE condition DO { commands }
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+    (44) Id -> . ID
+
+    }               reduce using rule 7 (commands -> .)
+    PRINT           shift and go to state 19
+    READ            shift and go to state 20
+    IF              shift and go to state 22
+    WHILE           shift and go to state 23
+    ID              shift and go to state 24
+
+    commands                       shift and go to state 9
+    command                        shift and go to state 10
+    cmd_prints                     shift and go to state 11
+    cmd_read                       shift and go to state 12
+    cmd_if                         shift and go to state 13
+    cmd_if_else                    shift and go to state 14
+    attribution                    shift and go to state 15
+    cmd_while                      shift and go to state 16
+    ID_Array                       shift and go to state 17
+    ID_Double_Array                shift and go to state 18
+    Id                             shift and go to state 21
+
+state 6
+
+    (4) declarations -> declaration . declarations
+    (3) declarations -> .
+    (4) declarations -> . declaration declarations
+    (5) declaration -> . INT ID
+    (6) declaration -> . INT ID = NUM
+    (48) declaration -> . INT ID [ NUM ]
+    (49) declaration -> . INT ID [ NUM ] = values
+    (58) declaration -> . INT ID [ NUM ] [ NUM ]
+    (59) declaration -> . INT ID [ NUM ] [ NUM ] = d_values
+
+    PRINT           reduce using rule 3 (declarations -> .)
+    READ            reduce using rule 3 (declarations -> .)
+    IF              reduce using rule 3 (declarations -> .)
+    WHILE           reduce using rule 3 (declarations -> .)
+    ID              reduce using rule 3 (declarations -> .)
+    }               reduce using rule 3 (declarations -> .)
+    INT             shift and go to state 7
+
+    declaration                    shift and go to state 6
+    declarations                   shift and go to state 25
+
+state 7
+
+    (5) declaration -> INT . ID
+    (6) declaration -> INT . ID = NUM
+    (48) declaration -> INT . ID [ NUM ]
+    (49) declaration -> INT . ID [ NUM ] = values
+    (58) declaration -> INT . ID [ NUM ] [ NUM ]
+    (59) declaration -> INT . ID [ NUM ] [ NUM ] = d_values
+
+    ID              shift and go to state 26
+
+
+state 8
+
+    (1) program -> { MAIN body } .
+
+    $end            reduce using rule 1 (program -> { MAIN body } .)
+
+
+state 9
+
+    (2) body -> declarations commands .
+
+    }               reduce using rule 2 (body -> declarations commands .)
+
+
+state 10
+
+    (8) commands -> command . commands
+    (7) commands -> .
+    (8) commands -> . command commands
+    (9) command -> . cmd_prints
+    (15) command -> . cmd_read
+    (17) command -> . cmd_if
+    (19) command -> . cmd_if_else
+    (21) command -> . attribution
+    (23) command -> . cmd_while
+    (54) command -> . ID_Array = exp
+    (60) command -> . ID_Double_Array = exp
+    (10) cmd_prints -> . PRINT ( cmd_print prints )
+    (16) cmd_read -> . READ Id
+    (51) cmd_read -> . READ ID_Array
+    (62) cmd_read -> . ID_Double_Array
+    (18) cmd_if -> . IF condition { commands }
+    (20) cmd_if_else -> . IF condition { commands } ELSE { commands }
+    (22) attribution -> . Id = exp
+    (24) cmd_while -> . WHILE condition DO { commands }
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+    (44) Id -> . ID
+
+    }               reduce using rule 7 (commands -> .)
+    PRINT           shift and go to state 19
+    READ            shift and go to state 20
+    IF              shift and go to state 22
+    WHILE           shift and go to state 23
+    ID              shift and go to state 24
+
+    command                        shift and go to state 10
+    commands                       shift and go to state 27
+    cmd_prints                     shift and go to state 11
+    cmd_read                       shift and go to state 12
+    cmd_if                         shift and go to state 13
+    cmd_if_else                    shift and go to state 14
+    attribution                    shift and go to state 15
+    cmd_while                      shift and go to state 16
+    ID_Array                       shift and go to state 17
+    ID_Double_Array                shift and go to state 18
+    Id                             shift and go to state 21
+
+state 11
+
+    (9) command -> cmd_prints .
+
+    PRINT           reduce using rule 9 (command -> cmd_prints .)
+    READ            reduce using rule 9 (command -> cmd_prints .)
+    IF              reduce using rule 9 (command -> cmd_prints .)
+    WHILE           reduce using rule 9 (command -> cmd_prints .)
+    ID              reduce using rule 9 (command -> cmd_prints .)
+    }               reduce using rule 9 (command -> cmd_prints .)
+
+
+state 12
+
+    (15) command -> cmd_read .
+
+    PRINT           reduce using rule 15 (command -> cmd_read .)
+    READ            reduce using rule 15 (command -> cmd_read .)
+    IF              reduce using rule 15 (command -> cmd_read .)
+    WHILE           reduce using rule 15 (command -> cmd_read .)
+    ID              reduce using rule 15 (command -> cmd_read .)
+    }               reduce using rule 15 (command -> cmd_read .)
+
+
+state 13
+
+    (17) command -> cmd_if .
+
+    PRINT           reduce using rule 17 (command -> cmd_if .)
+    READ            reduce using rule 17 (command -> cmd_if .)
+    IF              reduce using rule 17 (command -> cmd_if .)
+    WHILE           reduce using rule 17 (command -> cmd_if .)
+    ID              reduce using rule 17 (command -> cmd_if .)
+    }               reduce using rule 17 (command -> cmd_if .)
+
+
+state 14
+
+    (19) command -> cmd_if_else .
+
+    PRINT           reduce using rule 19 (command -> cmd_if_else .)
+    READ            reduce using rule 19 (command -> cmd_if_else .)
+    IF              reduce using rule 19 (command -> cmd_if_else .)
+    WHILE           reduce using rule 19 (command -> cmd_if_else .)
+    ID              reduce using rule 19 (command -> cmd_if_else .)
+    }               reduce using rule 19 (command -> cmd_if_else .)
+
+
+state 15
+
+    (21) command -> attribution .
+
+    PRINT           reduce using rule 21 (command -> attribution .)
+    READ            reduce using rule 21 (command -> attribution .)
+    IF              reduce using rule 21 (command -> attribution .)
+    WHILE           reduce using rule 21 (command -> attribution .)
+    ID              reduce using rule 21 (command -> attribution .)
+    }               reduce using rule 21 (command -> attribution .)
+
+
+state 16
+
+    (23) command -> cmd_while .
+
+    PRINT           reduce using rule 23 (command -> cmd_while .)
+    READ            reduce using rule 23 (command -> cmd_while .)
+    IF              reduce using rule 23 (command -> cmd_while .)
+    WHILE           reduce using rule 23 (command -> cmd_while .)
+    ID              reduce using rule 23 (command -> cmd_while .)
+    }               reduce using rule 23 (command -> cmd_while .)
+
+
+state 17
+
+    (54) command -> ID_Array . = exp
+
+    =               shift and go to state 28
+
+
+state 18
+
+    (60) command -> ID_Double_Array . = exp
+    (62) cmd_read -> ID_Double_Array .
+
+    =               shift and go to state 29
+    PRINT           reduce using rule 62 (cmd_read -> ID_Double_Array .)
+    READ            reduce using rule 62 (cmd_read -> ID_Double_Array .)
+    IF              reduce using rule 62 (cmd_read -> ID_Double_Array .)
+    WHILE           reduce using rule 62 (cmd_read -> ID_Double_Array .)
+    ID              reduce using rule 62 (cmd_read -> ID_Double_Array .)
+    }               reduce using rule 62 (cmd_read -> ID_Double_Array .)
+
+
+state 19
+
+    (10) cmd_prints -> PRINT . ( cmd_print prints )
+
+    (               shift and go to state 30
+
+
+state 20
+
+    (16) cmd_read -> READ . Id
+    (51) cmd_read -> READ . ID_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+
+    ID              shift and go to state 33
+
+    Id                             shift and go to state 31
+    ID_Array                       shift and go to state 32
+
+state 21
+
+    (22) attribution -> Id . = exp
+
+    =               shift and go to state 34
+
+
+state 22
+
+    (18) cmd_if -> IF . condition { commands }
+    (20) cmd_if_else -> IF . condition { commands } ELSE { commands }
+    (25) condition -> . ( context )
+    (26) condition -> . NOT ( context )
+    (27) condition -> . condition AND condition
+    (28) condition -> . condition OR condition
+
+    (               shift and go to state 36
+    NOT             shift and go to state 37
+
+    condition                      shift and go to state 35
+
+state 23
+
+    (24) cmd_while -> WHILE . condition DO { commands }
+    (25) condition -> . ( context )
+    (26) condition -> . NOT ( context )
+    (27) condition -> . condition AND condition
+    (28) condition -> . condition OR condition
+
+    (               shift and go to state 36
+    NOT             shift and go to state 37
+
+    condition                      shift and go to state 38
+
+state 24
+
+    (55) ID_Array -> ID . [ factor ]
+    (64) ID_Double_Array -> ID . [ factor ] [ factor ]
+    (44) Id -> ID .
+
+    [               shift and go to state 39
+    =               reduce using rule 44 (Id -> ID .)
+
+
+state 25
+
+    (4) declarations -> declaration declarations .
+
+    PRINT           reduce using rule 4 (declarations -> declaration declarations .)
+    READ            reduce using rule 4 (declarations -> declaration declarations .)
+    IF              reduce using rule 4 (declarations -> declaration declarations .)
+    WHILE           reduce using rule 4 (declarations -> declaration declarations .)
+    ID              reduce using rule 4 (declarations -> declaration declarations .)
+    }               reduce using rule 4 (declarations -> declaration declarations .)
+
+
+state 26
+
+    (5) declaration -> INT ID .
+    (6) declaration -> INT ID . = NUM
+    (48) declaration -> INT ID . [ NUM ]
+    (49) declaration -> INT ID . [ NUM ] = values
+    (58) declaration -> INT ID . [ NUM ] [ NUM ]
+    (59) declaration -> INT ID . [ NUM ] [ NUM ] = d_values
+
+    INT             reduce using rule 5 (declaration -> INT ID .)
+    PRINT           reduce using rule 5 (declaration -> INT ID .)
+    READ            reduce using rule 5 (declaration -> INT ID .)
+    IF              reduce using rule 5 (declaration -> INT ID .)
+    WHILE           reduce using rule 5 (declaration -> INT ID .)
+    ID              reduce using rule 5 (declaration -> INT ID .)
+    }               reduce using rule 5 (declaration -> INT ID .)
+    =               shift and go to state 40
+    [               shift and go to state 41
+
+
+state 27
+
+    (8) commands -> command commands .
+
+    }               reduce using rule 8 (commands -> command commands .)
+
+
+state 28
+
+    (54) command -> ID_Array = . exp
+    (35) exp -> . exp + term
+    (36) exp -> . exp - term
+    (37) exp -> . term
+    (38) term -> . term / factor
+    (39) term -> . term * factor
+    (40) term -> . term % factor
+    (41) term -> . factor
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    ID_Array                       shift and go to state 42
+    exp                            shift and go to state 43
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    Id                             shift and go to state 47
+    ID_Double_Array                shift and go to state 48
+
+state 29
+
+    (60) command -> ID_Double_Array = . exp
+    (35) exp -> . exp + term
+    (36) exp -> . exp - term
+    (37) exp -> . term
+    (38) term -> . term / factor
+    (39) term -> . term * factor
+    (40) term -> . term % factor
+    (41) term -> . factor
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    ID_Double_Array                shift and go to state 48
+    exp                            shift and go to state 50
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    Id                             shift and go to state 47
+    ID_Array                       shift and go to state 42
+
+state 30
+
+    (10) cmd_prints -> PRINT ( . cmd_print prints )
+    (13) cmd_print -> . Id
+    (14) cmd_print -> . STR
+    (50) cmd_print -> . ID_Array
+    (61) cmd_print -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    STR             shift and go to state 53
+    ID              shift and go to state 49
+
+    cmd_print                      shift and go to state 51
+    Id                             shift and go to state 52
+    ID_Array                       shift and go to state 54
+    ID_Double_Array                shift and go to state 55
+
+state 31
+
+    (16) cmd_read -> READ Id .
+
+    PRINT           reduce using rule 16 (cmd_read -> READ Id .)
+    READ            reduce using rule 16 (cmd_read -> READ Id .)
+    IF              reduce using rule 16 (cmd_read -> READ Id .)
+    WHILE           reduce using rule 16 (cmd_read -> READ Id .)
+    ID              reduce using rule 16 (cmd_read -> READ Id .)
+    }               reduce using rule 16 (cmd_read -> READ Id .)
+
+
+state 32
+
+    (51) cmd_read -> READ ID_Array .
+
+    PRINT           reduce using rule 51 (cmd_read -> READ ID_Array .)
+    READ            reduce using rule 51 (cmd_read -> READ ID_Array .)
+    IF              reduce using rule 51 (cmd_read -> READ ID_Array .)
+    WHILE           reduce using rule 51 (cmd_read -> READ ID_Array .)
+    ID              reduce using rule 51 (cmd_read -> READ ID_Array .)
+    }               reduce using rule 51 (cmd_read -> READ ID_Array .)
+
+
+state 33
+
+    (44) Id -> ID .
+    (55) ID_Array -> ID . [ factor ]
+
+    PRINT           reduce using rule 44 (Id -> ID .)
+    READ            reduce using rule 44 (Id -> ID .)
+    IF              reduce using rule 44 (Id -> ID .)
+    WHILE           reduce using rule 44 (Id -> ID .)
+    ID              reduce using rule 44 (Id -> ID .)
+    }               reduce using rule 44 (Id -> ID .)
+    [               shift and go to state 56
+
+
+state 34
+
+    (22) attribution -> Id = . exp
+    (35) exp -> . exp + term
+    (36) exp -> . exp - term
+    (37) exp -> . term
+    (38) term -> . term / factor
+    (39) term -> . term * factor
+    (40) term -> . term % factor
+    (41) term -> . factor
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    Id                             shift and go to state 47
+    exp                            shift and go to state 57
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    ID_Array                       shift and go to state 42
+    ID_Double_Array                shift and go to state 48
+
+state 35
+
+    (18) cmd_if -> IF condition . { commands }
+    (20) cmd_if_else -> IF condition . { commands } ELSE { commands }
+    (27) condition -> condition . AND condition
+    (28) condition -> condition . OR condition
+
+    {               shift and go to state 58
+    AND             shift and go to state 59
+    OR              shift and go to state 60
+
+
+state 36
+
+    (25) condition -> ( . context )
+    (29) context -> . exp EQUALS exp
+    (30) context -> . exp > exp
+    (31) context -> . exp < exp
+    (32) context -> . exp GREATERQ exp
+    (33) context -> . exp LESSERQ exp
+    (34) context -> . condition
+    (53) context -> . exp
+    (35) exp -> . exp + term
+    (36) exp -> . exp - term
+    (37) exp -> . term
+    (25) condition -> . ( context )
+    (26) condition -> . NOT ( context )
+    (27) condition -> . condition AND condition
+    (28) condition -> . condition OR condition
+    (38) term -> . term / factor
+    (39) term -> . term * factor
+    (40) term -> . term % factor
+    (41) term -> . factor
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    (               shift and go to state 36
+    NOT             shift and go to state 37
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    context                        shift and go to state 61
+    exp                            shift and go to state 62
+    condition                      shift and go to state 63
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    Id                             shift and go to state 47
+    ID_Array                       shift and go to state 42
+    ID_Double_Array                shift and go to state 48
+
+state 37
+
+    (26) condition -> NOT . ( context )
+
+    (               shift and go to state 64
+
+
+state 38
+
+    (24) cmd_while -> WHILE condition . DO { commands }
+    (27) condition -> condition . AND condition
+    (28) condition -> condition . OR condition
+
+    DO              shift and go to state 65
+    AND             shift and go to state 59
+    OR              shift and go to state 60
+
+
+state 39
+
+    (55) ID_Array -> ID [ . factor ]
+    (64) ID_Double_Array -> ID [ . factor ] [ factor ]
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    factor                         shift and go to state 66
+    Id                             shift and go to state 47
+    ID_Array                       shift and go to state 42
+    ID_Double_Array                shift and go to state 48
+
+state 40
+
+    (6) declaration -> INT ID = . NUM
+
+    NUM             shift and go to state 67
+
+
+state 41
+
+    (48) declaration -> INT ID [ . NUM ]
+    (49) declaration -> INT ID [ . NUM ] = values
+    (58) declaration -> INT ID [ . NUM ] [ NUM ]
+    (59) declaration -> INT ID [ . NUM ] [ NUM ] = d_values
+
+    NUM             shift and go to state 68
+
+
+state 42
+
+    (52) factor -> ID_Array .
+
+    /               reduce using rule 52 (factor -> ID_Array .)
+    *               reduce using rule 52 (factor -> ID_Array .)
+    %               reduce using rule 52 (factor -> ID_Array .)
+    +               reduce using rule 52 (factor -> ID_Array .)
+    -               reduce using rule 52 (factor -> ID_Array .)
+    PRINT           reduce using rule 52 (factor -> ID_Array .)
+    READ            reduce using rule 52 (factor -> ID_Array .)
+    IF              reduce using rule 52 (factor -> ID_Array .)
+    WHILE           reduce using rule 52 (factor -> ID_Array .)
+    ID              reduce using rule 52 (factor -> ID_Array .)
+    }               reduce using rule 52 (factor -> ID_Array .)
+    EQUALS          reduce using rule 52 (factor -> ID_Array .)
+    >               reduce using rule 52 (factor -> ID_Array .)
+    <               reduce using rule 52 (factor -> ID_Array .)
+    GREATERQ        reduce using rule 52 (factor -> ID_Array .)
+    LESSERQ         reduce using rule 52 (factor -> ID_Array .)
+    )               reduce using rule 52 (factor -> ID_Array .)
+    ]               reduce using rule 52 (factor -> ID_Array .)
+
+
+state 43
+
+    (54) command -> ID_Array = exp .
+    (35) exp -> exp . + term
+    (36) exp -> exp . - term
+
+    PRINT           reduce using rule 54 (command -> ID_Array = exp .)
+    READ            reduce using rule 54 (command -> ID_Array = exp .)
+    IF              reduce using rule 54 (command -> ID_Array = exp .)
+    WHILE           reduce using rule 54 (command -> ID_Array = exp .)
+    ID              reduce using rule 54 (command -> ID_Array = exp .)
+    }               reduce using rule 54 (command -> ID_Array = exp .)
+    +               shift and go to state 69
+    -               shift and go to state 70
+
+
+state 44
+
+    (37) exp -> term .
+    (38) term -> term . / factor
+    (39) term -> term . * factor
+    (40) term -> term . % factor
+
+    +               reduce using rule 37 (exp -> term .)
+    -               reduce using rule 37 (exp -> term .)
+    PRINT           reduce using rule 37 (exp -> term .)
+    READ            reduce using rule 37 (exp -> term .)
+    IF              reduce using rule 37 (exp -> term .)
+    WHILE           reduce using rule 37 (exp -> term .)
+    ID              reduce using rule 37 (exp -> term .)
+    }               reduce using rule 37 (exp -> term .)
+    EQUALS          reduce using rule 37 (exp -> term .)
+    >               reduce using rule 37 (exp -> term .)
+    <               reduce using rule 37 (exp -> term .)
+    GREATERQ        reduce using rule 37 (exp -> term .)
+    LESSERQ         reduce using rule 37 (exp -> term .)
+    )               reduce using rule 37 (exp -> term .)
+    /               shift and go to state 71
+    *               shift and go to state 72
+    %               shift and go to state 73
+
+
+state 45
+
+    (41) term -> factor .
+
+    /               reduce using rule 41 (term -> factor .)
+    *               reduce using rule 41 (term -> factor .)
+    %               reduce using rule 41 (term -> factor .)
+    +               reduce using rule 41 (term -> factor .)
+    -               reduce using rule 41 (term -> factor .)
+    PRINT           reduce using rule 41 (term -> factor .)
+    READ            reduce using rule 41 (term -> factor .)
+    IF              reduce using rule 41 (term -> factor .)
+    WHILE           reduce using rule 41 (term -> factor .)
+    ID              reduce using rule 41 (term -> factor .)
+    }               reduce using rule 41 (term -> factor .)
+    EQUALS          reduce using rule 41 (term -> factor .)
+    >               reduce using rule 41 (term -> factor .)
+    <               reduce using rule 41 (term -> factor .)
+    GREATERQ        reduce using rule 41 (term -> factor .)
+    LESSERQ         reduce using rule 41 (term -> factor .)
+    )               reduce using rule 41 (term -> factor .)
+
+
+state 46
+
+    (42) factor -> NUM .
+
+    /               reduce using rule 42 (factor -> NUM .)
+    *               reduce using rule 42 (factor -> NUM .)
+    %               reduce using rule 42 (factor -> NUM .)
+    +               reduce using rule 42 (factor -> NUM .)
+    -               reduce using rule 42 (factor -> NUM .)
+    PRINT           reduce using rule 42 (factor -> NUM .)
+    READ            reduce using rule 42 (factor -> NUM .)
+    IF              reduce using rule 42 (factor -> NUM .)
+    WHILE           reduce using rule 42 (factor -> NUM .)
+    ID              reduce using rule 42 (factor -> NUM .)
+    }               reduce using rule 42 (factor -> NUM .)
+    EQUALS          reduce using rule 42 (factor -> NUM .)
+    >               reduce using rule 42 (factor -> NUM .)
+    <               reduce using rule 42 (factor -> NUM .)
+    GREATERQ        reduce using rule 42 (factor -> NUM .)
+    LESSERQ         reduce using rule 42 (factor -> NUM .)
+    )               reduce using rule 42 (factor -> NUM .)
+    ]               reduce using rule 42 (factor -> NUM .)
+
+
+state 47
+
+    (43) factor -> Id .
+
+    /               reduce using rule 43 (factor -> Id .)
+    *               reduce using rule 43 (factor -> Id .)
+    %               reduce using rule 43 (factor -> Id .)
+    +               reduce using rule 43 (factor -> Id .)
+    -               reduce using rule 43 (factor -> Id .)
+    PRINT           reduce using rule 43 (factor -> Id .)
+    READ            reduce using rule 43 (factor -> Id .)
+    IF              reduce using rule 43 (factor -> Id .)
+    WHILE           reduce using rule 43 (factor -> Id .)
+    ID              reduce using rule 43 (factor -> Id .)
+    }               reduce using rule 43 (factor -> Id .)
+    EQUALS          reduce using rule 43 (factor -> Id .)
+    >               reduce using rule 43 (factor -> Id .)
+    <               reduce using rule 43 (factor -> Id .)
+    GREATERQ        reduce using rule 43 (factor -> Id .)
+    LESSERQ         reduce using rule 43 (factor -> Id .)
+    )               reduce using rule 43 (factor -> Id .)
+    ]               reduce using rule 43 (factor -> Id .)
+
+
+state 48
+
+    (63) factor -> ID_Double_Array .
+
+    /               reduce using rule 63 (factor -> ID_Double_Array .)
+    *               reduce using rule 63 (factor -> ID_Double_Array .)
+    %               reduce using rule 63 (factor -> ID_Double_Array .)
+    +               reduce using rule 63 (factor -> ID_Double_Array .)
+    -               reduce using rule 63 (factor -> ID_Double_Array .)
+    PRINT           reduce using rule 63 (factor -> ID_Double_Array .)
+    READ            reduce using rule 63 (factor -> ID_Double_Array .)
+    IF              reduce using rule 63 (factor -> ID_Double_Array .)
+    WHILE           reduce using rule 63 (factor -> ID_Double_Array .)
+    ID              reduce using rule 63 (factor -> ID_Double_Array .)
+    }               reduce using rule 63 (factor -> ID_Double_Array .)
+    EQUALS          reduce using rule 63 (factor -> ID_Double_Array .)
+    >               reduce using rule 63 (factor -> ID_Double_Array .)
+    <               reduce using rule 63 (factor -> ID_Double_Array .)
+    GREATERQ        reduce using rule 63 (factor -> ID_Double_Array .)
+    LESSERQ         reduce using rule 63 (factor -> ID_Double_Array .)
+    )               reduce using rule 63 (factor -> ID_Double_Array .)
+    ]               reduce using rule 63 (factor -> ID_Double_Array .)
+
+
+state 49
+
+    (44) Id -> ID .
+    (55) ID_Array -> ID . [ factor ]
+    (64) ID_Double_Array -> ID . [ factor ] [ factor ]
+
+    /               reduce using rule 44 (Id -> ID .)
+    *               reduce using rule 44 (Id -> ID .)
+    %               reduce using rule 44 (Id -> ID .)
+    +               reduce using rule 44 (Id -> ID .)
+    -               reduce using rule 44 (Id -> ID .)
+    PRINT           reduce using rule 44 (Id -> ID .)
+    READ            reduce using rule 44 (Id -> ID .)
+    IF              reduce using rule 44 (Id -> ID .)
+    WHILE           reduce using rule 44 (Id -> ID .)
+    ID              reduce using rule 44 (Id -> ID .)
+    }               reduce using rule 44 (Id -> ID .)
+    )               reduce using rule 44 (Id -> ID .)
+    EQUALS          reduce using rule 44 (Id -> ID .)
+    >               reduce using rule 44 (Id -> ID .)
+    <               reduce using rule 44 (Id -> ID .)
+    GREATERQ        reduce using rule 44 (Id -> ID .)
+    LESSERQ         reduce using rule 44 (Id -> ID .)
+    ]               reduce using rule 44 (Id -> ID .)
+    [               shift and go to state 39
+
+
+state 50
+
+    (60) command -> ID_Double_Array = exp .
+    (35) exp -> exp . + term
+    (36) exp -> exp . - term
+
+    PRINT           reduce using rule 60 (command -> ID_Double_Array = exp .)
+    READ            reduce using rule 60 (command -> ID_Double_Array = exp .)
+    IF              reduce using rule 60 (command -> ID_Double_Array = exp .)
+    WHILE           reduce using rule 60 (command -> ID_Double_Array = exp .)
+    ID              reduce using rule 60 (command -> ID_Double_Array = exp .)
+    }               reduce using rule 60 (command -> ID_Double_Array = exp .)
+    +               shift and go to state 69
+    -               shift and go to state 70
+
+
+state 51
+
+    (10) cmd_prints -> PRINT ( cmd_print . prints )
+    (11) prints -> . + cmd_print prints
+    (12) prints -> .
+
+    +               shift and go to state 75
+    )               reduce using rule 12 (prints -> .)
+
+    prints                         shift and go to state 74
+
+state 52
+
+    (13) cmd_print -> Id .
+
+    +               reduce using rule 13 (cmd_print -> Id .)
+    )               reduce using rule 13 (cmd_print -> Id .)
+
+
+state 53
+
+    (14) cmd_print -> STR .
+
+    +               reduce using rule 14 (cmd_print -> STR .)
+    )               reduce using rule 14 (cmd_print -> STR .)
+
+
+state 54
+
+    (50) cmd_print -> ID_Array .
+
+    +               reduce using rule 50 (cmd_print -> ID_Array .)
+    )               reduce using rule 50 (cmd_print -> ID_Array .)
+
+
+state 55
+
+    (61) cmd_print -> ID_Double_Array .
+
+    +               reduce using rule 61 (cmd_print -> ID_Double_Array .)
+    )               reduce using rule 61 (cmd_print -> ID_Double_Array .)
+
+
+state 56
+
+    (55) ID_Array -> ID [ . factor ]
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    factor                         shift and go to state 76
+    Id                             shift and go to state 47
+    ID_Array                       shift and go to state 42
+    ID_Double_Array                shift and go to state 48
+
+state 57
+
+    (22) attribution -> Id = exp .
+    (35) exp -> exp . + term
+    (36) exp -> exp . - term
+
+    PRINT           reduce using rule 22 (attribution -> Id = exp .)
+    READ            reduce using rule 22 (attribution -> Id = exp .)
+    IF              reduce using rule 22 (attribution -> Id = exp .)
+    WHILE           reduce using rule 22 (attribution -> Id = exp .)
+    ID              reduce using rule 22 (attribution -> Id = exp .)
+    }               reduce using rule 22 (attribution -> Id = exp .)
+    +               shift and go to state 69
+    -               shift and go to state 70
+
+
+state 58
+
+    (18) cmd_if -> IF condition { . commands }
+    (20) cmd_if_else -> IF condition { . commands } ELSE { commands }
+    (7) commands -> .
+    (8) commands -> . command commands
+    (9) command -> . cmd_prints
+    (15) command -> . cmd_read
+    (17) command -> . cmd_if
+    (19) command -> . cmd_if_else
+    (21) command -> . attribution
+    (23) command -> . cmd_while
+    (54) command -> . ID_Array = exp
+    (60) command -> . ID_Double_Array = exp
+    (10) cmd_prints -> . PRINT ( cmd_print prints )
+    (16) cmd_read -> . READ Id
+    (51) cmd_read -> . READ ID_Array
+    (62) cmd_read -> . ID_Double_Array
+    (18) cmd_if -> . IF condition { commands }
+    (20) cmd_if_else -> . IF condition { commands } ELSE { commands }
+    (22) attribution -> . Id = exp
+    (24) cmd_while -> . WHILE condition DO { commands }
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+    (44) Id -> . ID
+
+    }               reduce using rule 7 (commands -> .)
+    PRINT           shift and go to state 19
+    READ            shift and go to state 20
+    IF              shift and go to state 22
+    WHILE           shift and go to state 23
+    ID              shift and go to state 24
+
+    commands                       shift and go to state 77
+    command                        shift and go to state 10
+    cmd_prints                     shift and go to state 11
+    cmd_read                       shift and go to state 12
+    cmd_if                         shift and go to state 13
+    cmd_if_else                    shift and go to state 14
+    attribution                    shift and go to state 15
+    cmd_while                      shift and go to state 16
+    ID_Array                       shift and go to state 17
+    ID_Double_Array                shift and go to state 18
+    Id                             shift and go to state 21
+
+state 59
+
+    (27) condition -> condition AND . condition
+    (25) condition -> . ( context )
+    (26) condition -> . NOT ( context )
+    (27) condition -> . condition AND condition
+    (28) condition -> . condition OR condition
+
+    (               shift and go to state 36
+    NOT             shift and go to state 37
+
+    condition                      shift and go to state 78
+
+state 60
+
+    (28) condition -> condition OR . condition
+    (25) condition -> . ( context )
+    (26) condition -> . NOT ( context )
+    (27) condition -> . condition AND condition
+    (28) condition -> . condition OR condition
+
+    (               shift and go to state 36
+    NOT             shift and go to state 37
+
+    condition                      shift and go to state 79
+
+state 61
+
+    (25) condition -> ( context . )
+
+    )               shift and go to state 80
+
+
+state 62
+
+    (29) context -> exp . EQUALS exp
+    (30) context -> exp . > exp
+    (31) context -> exp . < exp
+    (32) context -> exp . GREATERQ exp
+    (33) context -> exp . LESSERQ exp
+    (53) context -> exp .
+    (35) exp -> exp . + term
+    (36) exp -> exp . - term
+
+    EQUALS          shift and go to state 81
+    >               shift and go to state 82
+    <               shift and go to state 83
+    GREATERQ        shift and go to state 84
+    LESSERQ         shift and go to state 85
+    )               reduce using rule 53 (context -> exp .)
+    +               shift and go to state 69
+    -               shift and go to state 70
+
+
+state 63
+
+    (34) context -> condition .
+    (27) condition -> condition . AND condition
+    (28) condition -> condition . OR condition
+
+    )               reduce using rule 34 (context -> condition .)
+    AND             shift and go to state 59
+    OR              shift and go to state 60
+
+
+state 64
+
+    (26) condition -> NOT ( . context )
+    (29) context -> . exp EQUALS exp
+    (30) context -> . exp > exp
+    (31) context -> . exp < exp
+    (32) context -> . exp GREATERQ exp
+    (33) context -> . exp LESSERQ exp
+    (34) context -> . condition
+    (53) context -> . exp
+    (35) exp -> . exp + term
+    (36) exp -> . exp - term
+    (37) exp -> . term
+    (25) condition -> . ( context )
+    (26) condition -> . NOT ( context )
+    (27) condition -> . condition AND condition
+    (28) condition -> . condition OR condition
+    (38) term -> . term / factor
+    (39) term -> . term * factor
+    (40) term -> . term % factor
+    (41) term -> . factor
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    (               shift and go to state 36
+    NOT             shift and go to state 37
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    context                        shift and go to state 86
+    exp                            shift and go to state 62
+    condition                      shift and go to state 63
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    Id                             shift and go to state 47
+    ID_Array                       shift and go to state 42
+    ID_Double_Array                shift and go to state 48
+
+state 65
+
+    (24) cmd_while -> WHILE condition DO . { commands }
+
+    {               shift and go to state 87
+
+
+state 66
+
+    (55) ID_Array -> ID [ factor . ]
+    (64) ID_Double_Array -> ID [ factor . ] [ factor ]
+
+    ]               shift and go to state 88
+
+
+state 67
+
+    (6) declaration -> INT ID = NUM .
+
+    INT             reduce using rule 6 (declaration -> INT ID = NUM .)
+    PRINT           reduce using rule 6 (declaration -> INT ID = NUM .)
+    READ            reduce using rule 6 (declaration -> INT ID = NUM .)
+    IF              reduce using rule 6 (declaration -> INT ID = NUM .)
+    WHILE           reduce using rule 6 (declaration -> INT ID = NUM .)
+    ID              reduce using rule 6 (declaration -> INT ID = NUM .)
+    }               reduce using rule 6 (declaration -> INT ID = NUM .)
+
+
+state 68
+
+    (48) declaration -> INT ID [ NUM . ]
+    (49) declaration -> INT ID [ NUM . ] = values
+    (58) declaration -> INT ID [ NUM . ] [ NUM ]
+    (59) declaration -> INT ID [ NUM . ] [ NUM ] = d_values
+
+    ]               shift and go to state 89
+
+
+state 69
+
+    (35) exp -> exp + . term
+    (38) term -> . term / factor
+    (39) term -> . term * factor
+    (40) term -> . term % factor
+    (41) term -> . factor
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    term                           shift and go to state 90
+    factor                         shift and go to state 45
+    Id                             shift and go to state 47
+    ID_Array                       shift and go to state 42
+    ID_Double_Array                shift and go to state 48
+
+state 70
+
+    (36) exp -> exp - . term
+    (38) term -> . term / factor
+    (39) term -> . term * factor
+    (40) term -> . term % factor
+    (41) term -> . factor
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    term                           shift and go to state 91
+    factor                         shift and go to state 45
+    Id                             shift and go to state 47
+    ID_Array                       shift and go to state 42
+    ID_Double_Array                shift and go to state 48
+
+state 71
+
+    (38) term -> term / . factor
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    factor                         shift and go to state 92
+    Id                             shift and go to state 47
+    ID_Array                       shift and go to state 42
+    ID_Double_Array                shift and go to state 48
+
+state 72
+
+    (39) term -> term * . factor
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    factor                         shift and go to state 93
+    Id                             shift and go to state 47
+    ID_Array                       shift and go to state 42
+    ID_Double_Array                shift and go to state 48
+
+state 73
+
+    (40) term -> term % . factor
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    factor                         shift and go to state 94
+    Id                             shift and go to state 47
+    ID_Array                       shift and go to state 42
+    ID_Double_Array                shift and go to state 48
+
+state 74
+
+    (10) cmd_prints -> PRINT ( cmd_print prints . )
+
+    )               shift and go to state 95
+
+
+state 75
+
+    (11) prints -> + . cmd_print prints
+    (13) cmd_print -> . Id
+    (14) cmd_print -> . STR
+    (50) cmd_print -> . ID_Array
+    (61) cmd_print -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    STR             shift and go to state 53
+    ID              shift and go to state 49
+
+    cmd_print                      shift and go to state 96
+    Id                             shift and go to state 52
+    ID_Array                       shift and go to state 54
+    ID_Double_Array                shift and go to state 55
+
+state 76
+
+    (55) ID_Array -> ID [ factor . ]
+
+    ]               shift and go to state 97
+
+
+state 77
+
+    (18) cmd_if -> IF condition { commands . }
+    (20) cmd_if_else -> IF condition { commands . } ELSE { commands }
+
+    }               shift and go to state 98
+
+
+state 78
+
+    (27) condition -> condition AND condition .
+    (27) condition -> condition . AND condition
+    (28) condition -> condition . OR condition
+
+  ! shift/reduce conflict for AND resolved as shift
+  ! shift/reduce conflict for OR resolved as shift
+    {               reduce using rule 27 (condition -> condition AND condition .)
+    DO              reduce using rule 27 (condition -> condition AND condition .)
+    )               reduce using rule 27 (condition -> condition AND condition .)
+    AND             shift and go to state 59
+    OR              shift and go to state 60
+
+  ! AND             [ reduce using rule 27 (condition -> condition AND condition .) ]
+  ! OR              [ reduce using rule 27 (condition -> condition AND condition .) ]
+
+
+state 79
+
+    (28) condition -> condition OR condition .
+    (27) condition -> condition . AND condition
+    (28) condition -> condition . OR condition
+
+  ! shift/reduce conflict for AND resolved as shift
+  ! shift/reduce conflict for OR resolved as shift
+    {               reduce using rule 28 (condition -> condition OR condition .)
+    DO              reduce using rule 28 (condition -> condition OR condition .)
+    )               reduce using rule 28 (condition -> condition OR condition .)
+    AND             shift and go to state 59
+    OR              shift and go to state 60
+
+  ! AND             [ reduce using rule 28 (condition -> condition OR condition .) ]
+  ! OR              [ reduce using rule 28 (condition -> condition OR condition .) ]
+
+
+state 80
+
+    (25) condition -> ( context ) .
+
+    {               reduce using rule 25 (condition -> ( context ) .)
+    AND             reduce using rule 25 (condition -> ( context ) .)
+    OR              reduce using rule 25 (condition -> ( context ) .)
+    DO              reduce using rule 25 (condition -> ( context ) .)
+    )               reduce using rule 25 (condition -> ( context ) .)
+
+
+state 81
+
+    (29) context -> exp EQUALS . exp
+    (35) exp -> . exp + term
+    (36) exp -> . exp - term
+    (37) exp -> . term
+    (38) term -> . term / factor
+    (39) term -> . term * factor
+    (40) term -> . term % factor
+    (41) term -> . factor
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    exp                            shift and go to state 99
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    Id                             shift and go to state 47
+    ID_Array                       shift and go to state 42
+    ID_Double_Array                shift and go to state 48
+
+state 82
+
+    (30) context -> exp > . exp
+    (35) exp -> . exp + term
+    (36) exp -> . exp - term
+    (37) exp -> . term
+    (38) term -> . term / factor
+    (39) term -> . term * factor
+    (40) term -> . term % factor
+    (41) term -> . factor
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    exp                            shift and go to state 100
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    Id                             shift and go to state 47
+    ID_Array                       shift and go to state 42
+    ID_Double_Array                shift and go to state 48
+
+state 83
+
+    (31) context -> exp < . exp
+    (35) exp -> . exp + term
+    (36) exp -> . exp - term
+    (37) exp -> . term
+    (38) term -> . term / factor
+    (39) term -> . term * factor
+    (40) term -> . term % factor
+    (41) term -> . factor
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    exp                            shift and go to state 101
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    Id                             shift and go to state 47
+    ID_Array                       shift and go to state 42
+    ID_Double_Array                shift and go to state 48
+
+state 84
+
+    (32) context -> exp GREATERQ . exp
+    (35) exp -> . exp + term
+    (36) exp -> . exp - term
+    (37) exp -> . term
+    (38) term -> . term / factor
+    (39) term -> . term * factor
+    (40) term -> . term % factor
+    (41) term -> . factor
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    exp                            shift and go to state 102
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    Id                             shift and go to state 47
+    ID_Array                       shift and go to state 42
+    ID_Double_Array                shift and go to state 48
+
+state 85
+
+    (33) context -> exp LESSERQ . exp
+    (35) exp -> . exp + term
+    (36) exp -> . exp - term
+    (37) exp -> . term
+    (38) term -> . term / factor
+    (39) term -> . term * factor
+    (40) term -> . term % factor
+    (41) term -> . factor
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    exp                            shift and go to state 103
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    Id                             shift and go to state 47
+    ID_Array                       shift and go to state 42
+    ID_Double_Array                shift and go to state 48
+
+state 86
+
+    (26) condition -> NOT ( context . )
+
+    )               shift and go to state 104
+
+
+state 87
+
+    (24) cmd_while -> WHILE condition DO { . commands }
+    (7) commands -> .
+    (8) commands -> . command commands
+    (9) command -> . cmd_prints
+    (15) command -> . cmd_read
+    (17) command -> . cmd_if
+    (19) command -> . cmd_if_else
+    (21) command -> . attribution
+    (23) command -> . cmd_while
+    (54) command -> . ID_Array = exp
+    (60) command -> . ID_Double_Array = exp
+    (10) cmd_prints -> . PRINT ( cmd_print prints )
+    (16) cmd_read -> . READ Id
+    (51) cmd_read -> . READ ID_Array
+    (62) cmd_read -> . ID_Double_Array
+    (18) cmd_if -> . IF condition { commands }
+    (20) cmd_if_else -> . IF condition { commands } ELSE { commands }
+    (22) attribution -> . Id = exp
+    (24) cmd_while -> . WHILE condition DO { commands }
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+    (44) Id -> . ID
+
+    }               reduce using rule 7 (commands -> .)
+    PRINT           shift and go to state 19
+    READ            shift and go to state 20
+    IF              shift and go to state 22
+    WHILE           shift and go to state 23
+    ID              shift and go to state 24
+
+    commands                       shift and go to state 105
+    command                        shift and go to state 10
+    cmd_prints                     shift and go to state 11
+    cmd_read                       shift and go to state 12
+    cmd_if                         shift and go to state 13
+    cmd_if_else                    shift and go to state 14
+    attribution                    shift and go to state 15
+    cmd_while                      shift and go to state 16
+    ID_Array                       shift and go to state 17
+    ID_Double_Array                shift and go to state 18
+    Id                             shift and go to state 21
+
+state 88
+
+    (55) ID_Array -> ID [ factor ] .
+    (64) ID_Double_Array -> ID [ factor ] . [ factor ]
+
+    =               reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    /               reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    *               reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    %               reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    +               reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    -               reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    PRINT           reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    READ            reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    IF              reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    WHILE           reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    ID              reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    }               reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    )               reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    EQUALS          reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    >               reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    <               reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    GREATERQ        reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    LESSERQ         reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    ]               reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    [               shift and go to state 106
+
+
+state 89
+
+    (48) declaration -> INT ID [ NUM ] .
+    (49) declaration -> INT ID [ NUM ] . = values
+    (58) declaration -> INT ID [ NUM ] . [ NUM ]
+    (59) declaration -> INT ID [ NUM ] . [ NUM ] = d_values
+
+    INT             reduce using rule 48 (declaration -> INT ID [ NUM ] .)
+    PRINT           reduce using rule 48 (declaration -> INT ID [ NUM ] .)
+    READ            reduce using rule 48 (declaration -> INT ID [ NUM ] .)
+    IF              reduce using rule 48 (declaration -> INT ID [ NUM ] .)
+    WHILE           reduce using rule 48 (declaration -> INT ID [ NUM ] .)
+    ID              reduce using rule 48 (declaration -> INT ID [ NUM ] .)
+    }               reduce using rule 48 (declaration -> INT ID [ NUM ] .)
+    =               shift and go to state 108
+    [               shift and go to state 107
+
+
+state 90
+
+    (35) exp -> exp + term .
+    (38) term -> term . / factor
+    (39) term -> term . * factor
+    (40) term -> term . % factor
+
+    +               reduce using rule 35 (exp -> exp + term .)
+    -               reduce using rule 35 (exp -> exp + term .)
+    PRINT           reduce using rule 35 (exp -> exp + term .)
+    READ            reduce using rule 35 (exp -> exp + term .)
+    IF              reduce using rule 35 (exp -> exp + term .)
+    WHILE           reduce using rule 35 (exp -> exp + term .)
+    ID              reduce using rule 35 (exp -> exp + term .)
+    }               reduce using rule 35 (exp -> exp + term .)
+    EQUALS          reduce using rule 35 (exp -> exp + term .)
+    >               reduce using rule 35 (exp -> exp + term .)
+    <               reduce using rule 35 (exp -> exp + term .)
+    GREATERQ        reduce using rule 35 (exp -> exp + term .)
+    LESSERQ         reduce using rule 35 (exp -> exp + term .)
+    )               reduce using rule 35 (exp -> exp + term .)
+    /               shift and go to state 71
+    *               shift and go to state 72
+    %               shift and go to state 73
+
+
+state 91
+
+    (36) exp -> exp - term .
+    (38) term -> term . / factor
+    (39) term -> term . * factor
+    (40) term -> term . % factor
+
+    +               reduce using rule 36 (exp -> exp - term .)
+    -               reduce using rule 36 (exp -> exp - term .)
+    PRINT           reduce using rule 36 (exp -> exp - term .)
+    READ            reduce using rule 36 (exp -> exp - term .)
+    IF              reduce using rule 36 (exp -> exp - term .)
+    WHILE           reduce using rule 36 (exp -> exp - term .)
+    ID              reduce using rule 36 (exp -> exp - term .)
+    }               reduce using rule 36 (exp -> exp - term .)
+    EQUALS          reduce using rule 36 (exp -> exp - term .)
+    >               reduce using rule 36 (exp -> exp - term .)
+    <               reduce using rule 36 (exp -> exp - term .)
+    GREATERQ        reduce using rule 36 (exp -> exp - term .)
+    LESSERQ         reduce using rule 36 (exp -> exp - term .)
+    )               reduce using rule 36 (exp -> exp - term .)
+    /               shift and go to state 71
+    *               shift and go to state 72
+    %               shift and go to state 73
+
+
+state 92
+
+    (38) term -> term / factor .
+
+    /               reduce using rule 38 (term -> term / factor .)
+    *               reduce using rule 38 (term -> term / factor .)
+    %               reduce using rule 38 (term -> term / factor .)
+    +               reduce using rule 38 (term -> term / factor .)
+    -               reduce using rule 38 (term -> term / factor .)
+    PRINT           reduce using rule 38 (term -> term / factor .)
+    READ            reduce using rule 38 (term -> term / factor .)
+    IF              reduce using rule 38 (term -> term / factor .)
+    WHILE           reduce using rule 38 (term -> term / factor .)
+    ID              reduce using rule 38 (term -> term / factor .)
+    }               reduce using rule 38 (term -> term / factor .)
+    EQUALS          reduce using rule 38 (term -> term / factor .)
+    >               reduce using rule 38 (term -> term / factor .)
+    <               reduce using rule 38 (term -> term / factor .)
+    GREATERQ        reduce using rule 38 (term -> term / factor .)
+    LESSERQ         reduce using rule 38 (term -> term / factor .)
+    )               reduce using rule 38 (term -> term / factor .)
+
+
+state 93
+
+    (39) term -> term * factor .
+
+    /               reduce using rule 39 (term -> term * factor .)
+    *               reduce using rule 39 (term -> term * factor .)
+    %               reduce using rule 39 (term -> term * factor .)
+    +               reduce using rule 39 (term -> term * factor .)
+    -               reduce using rule 39 (term -> term * factor .)
+    PRINT           reduce using rule 39 (term -> term * factor .)
+    READ            reduce using rule 39 (term -> term * factor .)
+    IF              reduce using rule 39 (term -> term * factor .)
+    WHILE           reduce using rule 39 (term -> term * factor .)
+    ID              reduce using rule 39 (term -> term * factor .)
+    }               reduce using rule 39 (term -> term * factor .)
+    EQUALS          reduce using rule 39 (term -> term * factor .)
+    >               reduce using rule 39 (term -> term * factor .)
+    <               reduce using rule 39 (term -> term * factor .)
+    GREATERQ        reduce using rule 39 (term -> term * factor .)
+    LESSERQ         reduce using rule 39 (term -> term * factor .)
+    )               reduce using rule 39 (term -> term * factor .)
+
+
+state 94
+
+    (40) term -> term % factor .
+
+    /               reduce using rule 40 (term -> term % factor .)
+    *               reduce using rule 40 (term -> term % factor .)
+    %               reduce using rule 40 (term -> term % factor .)
+    +               reduce using rule 40 (term -> term % factor .)
+    -               reduce using rule 40 (term -> term % factor .)
+    PRINT           reduce using rule 40 (term -> term % factor .)
+    READ            reduce using rule 40 (term -> term % factor .)
+    IF              reduce using rule 40 (term -> term % factor .)
+    WHILE           reduce using rule 40 (term -> term % factor .)
+    ID              reduce using rule 40 (term -> term % factor .)
+    }               reduce using rule 40 (term -> term % factor .)
+    EQUALS          reduce using rule 40 (term -> term % factor .)
+    >               reduce using rule 40 (term -> term % factor .)
+    <               reduce using rule 40 (term -> term % factor .)
+    GREATERQ        reduce using rule 40 (term -> term % factor .)
+    LESSERQ         reduce using rule 40 (term -> term % factor .)
+    )               reduce using rule 40 (term -> term % factor .)
+
+
+state 95
+
+    (10) cmd_prints -> PRINT ( cmd_print prints ) .
+
+    PRINT           reduce using rule 10 (cmd_prints -> PRINT ( cmd_print prints ) .)
+    READ            reduce using rule 10 (cmd_prints -> PRINT ( cmd_print prints ) .)
+    IF              reduce using rule 10 (cmd_prints -> PRINT ( cmd_print prints ) .)
+    WHILE           reduce using rule 10 (cmd_prints -> PRINT ( cmd_print prints ) .)
+    ID              reduce using rule 10 (cmd_prints -> PRINT ( cmd_print prints ) .)
+    }               reduce using rule 10 (cmd_prints -> PRINT ( cmd_print prints ) .)
+
+
+state 96
+
+    (11) prints -> + cmd_print . prints
+    (11) prints -> . + cmd_print prints
+    (12) prints -> .
+
+    +               shift and go to state 75
+    )               reduce using rule 12 (prints -> .)
+
+    prints                         shift and go to state 109
+
+state 97
+
+    (55) ID_Array -> ID [ factor ] .
+
+    PRINT           reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    READ            reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    IF              reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    WHILE           reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    ID              reduce using rule 55 (ID_Array -> ID [ factor ] .)
+    }               reduce using rule 55 (ID_Array -> ID [ factor ] .)
+
+
+state 98
+
+    (18) cmd_if -> IF condition { commands } .
+    (20) cmd_if_else -> IF condition { commands } . ELSE { commands }
+
+    PRINT           reduce using rule 18 (cmd_if -> IF condition { commands } .)
+    READ            reduce using rule 18 (cmd_if -> IF condition { commands } .)
+    IF              reduce using rule 18 (cmd_if -> IF condition { commands } .)
+    WHILE           reduce using rule 18 (cmd_if -> IF condition { commands } .)
+    ID              reduce using rule 18 (cmd_if -> IF condition { commands } .)
+    }               reduce using rule 18 (cmd_if -> IF condition { commands } .)
+    ELSE            shift and go to state 110
+
+
+state 99
+
+    (29) context -> exp EQUALS exp .
+    (35) exp -> exp . + term
+    (36) exp -> exp . - term
+
+    )               reduce using rule 29 (context -> exp EQUALS exp .)
+    +               shift and go to state 69
+    -               shift and go to state 70
+
+
+state 100
+
+    (30) context -> exp > exp .
+    (35) exp -> exp . + term
+    (36) exp -> exp . - term
+
+    )               reduce using rule 30 (context -> exp > exp .)
+    +               shift and go to state 69
+    -               shift and go to state 70
+
+
+state 101
+
+    (31) context -> exp < exp .
+    (35) exp -> exp . + term
+    (36) exp -> exp . - term
+
+    )               reduce using rule 31 (context -> exp < exp .)
+    +               shift and go to state 69
+    -               shift and go to state 70
+
+
+state 102
+
+    (32) context -> exp GREATERQ exp .
+    (35) exp -> exp . + term
+    (36) exp -> exp . - term
+
+    )               reduce using rule 32 (context -> exp GREATERQ exp .)
+    +               shift and go to state 69
+    -               shift and go to state 70
+
+
+state 103
+
+    (33) context -> exp LESSERQ exp .
+    (35) exp -> exp . + term
+    (36) exp -> exp . - term
+
+    )               reduce using rule 33 (context -> exp LESSERQ exp .)
+    +               shift and go to state 69
+    -               shift and go to state 70
+
+
+state 104
+
+    (26) condition -> NOT ( context ) .
+
+    {               reduce using rule 26 (condition -> NOT ( context ) .)
+    AND             reduce using rule 26 (condition -> NOT ( context ) .)
+    OR              reduce using rule 26 (condition -> NOT ( context ) .)
+    DO              reduce using rule 26 (condition -> NOT ( context ) .)
+    )               reduce using rule 26 (condition -> NOT ( context ) .)
+
+
+state 105
+
+    (24) cmd_while -> WHILE condition DO { commands . }
+
+    }               shift and go to state 111
+
+
+state 106
+
+    (64) ID_Double_Array -> ID [ factor ] [ . factor ]
+    (42) factor -> . NUM
+    (43) factor -> . Id
+    (52) factor -> . ID_Array
+    (63) factor -> . ID_Double_Array
+    (44) Id -> . ID
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+
+    NUM             shift and go to state 46
+    ID              shift and go to state 49
+
+    factor                         shift and go to state 112
+    Id                             shift and go to state 47
+    ID_Array                       shift and go to state 42
+    ID_Double_Array                shift and go to state 48
+
+state 107
+
+    (58) declaration -> INT ID [ NUM ] [ . NUM ]
+    (59) declaration -> INT ID [ NUM ] [ . NUM ] = d_values
+
+    NUM             shift and go to state 113
+
+
+state 108
+
+    (49) declaration -> INT ID [ NUM ] = . values
+    (45) values -> . NUM , values
+    (46) values -> . NUM
+    (47) values -> .
+
+    NUM             shift and go to state 114
+    INT             reduce using rule 47 (values -> .)
+    PRINT           reduce using rule 47 (values -> .)
+    READ            reduce using rule 47 (values -> .)
+    IF              reduce using rule 47 (values -> .)
+    WHILE           reduce using rule 47 (values -> .)
+    ID              reduce using rule 47 (values -> .)
+    }               reduce using rule 47 (values -> .)
+
+    values                         shift and go to state 115
+
+state 109
+
+    (11) prints -> + cmd_print prints .
+
+    )               reduce using rule 11 (prints -> + cmd_print prints .)
+
+
+state 110
+
+    (20) cmd_if_else -> IF condition { commands } ELSE . { commands }
+
+    {               shift and go to state 116
+
+
+state 111
+
+    (24) cmd_while -> WHILE condition DO { commands } .
+
+    PRINT           reduce using rule 24 (cmd_while -> WHILE condition DO { commands } .)
+    READ            reduce using rule 24 (cmd_while -> WHILE condition DO { commands } .)
+    IF              reduce using rule 24 (cmd_while -> WHILE condition DO { commands } .)
+    WHILE           reduce using rule 24 (cmd_while -> WHILE condition DO { commands } .)
+    ID              reduce using rule 24 (cmd_while -> WHILE condition DO { commands } .)
+    }               reduce using rule 24 (cmd_while -> WHILE condition DO { commands } .)
+
+
+state 112
+
+    (64) ID_Double_Array -> ID [ factor ] [ factor . ]
+
+    ]               shift and go to state 117
+
+
+state 113
+
+    (58) declaration -> INT ID [ NUM ] [ NUM . ]
+    (59) declaration -> INT ID [ NUM ] [ NUM . ] = d_values
+
+    ]               shift and go to state 118
+
+
+state 114
+
+    (45) values -> NUM . , values
+    (46) values -> NUM .
+
+    ,               shift and go to state 119
+    INT             reduce using rule 46 (values -> NUM .)
+    PRINT           reduce using rule 46 (values -> NUM .)
+    READ            reduce using rule 46 (values -> NUM .)
+    IF              reduce using rule 46 (values -> NUM .)
+    WHILE           reduce using rule 46 (values -> NUM .)
+    ID              reduce using rule 46 (values -> NUM .)
+    }               reduce using rule 46 (values -> NUM .)
+    ]               reduce using rule 46 (values -> NUM .)
+
+
+state 115
+
+    (49) declaration -> INT ID [ NUM ] = values .
+
+    INT             reduce using rule 49 (declaration -> INT ID [ NUM ] = values .)
+    PRINT           reduce using rule 49 (declaration -> INT ID [ NUM ] = values .)
+    READ            reduce using rule 49 (declaration -> INT ID [ NUM ] = values .)
+    IF              reduce using rule 49 (declaration -> INT ID [ NUM ] = values .)
+    WHILE           reduce using rule 49 (declaration -> INT ID [ NUM ] = values .)
+    ID              reduce using rule 49 (declaration -> INT ID [ NUM ] = values .)
+    }               reduce using rule 49 (declaration -> INT ID [ NUM ] = values .)
+
+
+state 116
+
+    (20) cmd_if_else -> IF condition { commands } ELSE { . commands }
+    (7) commands -> .
+    (8) commands -> . command commands
+    (9) command -> . cmd_prints
+    (15) command -> . cmd_read
+    (17) command -> . cmd_if
+    (19) command -> . cmd_if_else
+    (21) command -> . attribution
+    (23) command -> . cmd_while
+    (54) command -> . ID_Array = exp
+    (60) command -> . ID_Double_Array = exp
+    (10) cmd_prints -> . PRINT ( cmd_print prints )
+    (16) cmd_read -> . READ Id
+    (51) cmd_read -> . READ ID_Array
+    (62) cmd_read -> . ID_Double_Array
+    (18) cmd_if -> . IF condition { commands }
+    (20) cmd_if_else -> . IF condition { commands } ELSE { commands }
+    (22) attribution -> . Id = exp
+    (24) cmd_while -> . WHILE condition DO { commands }
+    (55) ID_Array -> . ID [ factor ]
+    (64) ID_Double_Array -> . ID [ factor ] [ factor ]
+    (44) Id -> . ID
+
+    }               reduce using rule 7 (commands -> .)
+    PRINT           shift and go to state 19
+    READ            shift and go to state 20
+    IF              shift and go to state 22
+    WHILE           shift and go to state 23
+    ID              shift and go to state 24
+
+    commands                       shift and go to state 120
+    command                        shift and go to state 10
+    cmd_prints                     shift and go to state 11
+    cmd_read                       shift and go to state 12
+    cmd_if                         shift and go to state 13
+    cmd_if_else                    shift and go to state 14
+    attribution                    shift and go to state 15
+    cmd_while                      shift and go to state 16
+    ID_Array                       shift and go to state 17
+    ID_Double_Array                shift and go to state 18
+    Id                             shift and go to state 21
+
+state 117
+
+    (64) ID_Double_Array -> ID [ factor ] [ factor ] .
+
+    =               reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    PRINT           reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    READ            reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    IF              reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    WHILE           reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    ID              reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    }               reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    /               reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    *               reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    %               reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    +               reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    -               reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    )               reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    EQUALS          reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    >               reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    <               reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    GREATERQ        reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    LESSERQ         reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+    ]               reduce using rule 64 (ID_Double_Array -> ID [ factor ] [ factor ] .)
+
+
+state 118
+
+    (58) declaration -> INT ID [ NUM ] [ NUM ] .
+    (59) declaration -> INT ID [ NUM ] [ NUM ] . = d_values
+
+    INT             reduce using rule 58 (declaration -> INT ID [ NUM ] [ NUM ] .)
+    PRINT           reduce using rule 58 (declaration -> INT ID [ NUM ] [ NUM ] .)
+    READ            reduce using rule 58 (declaration -> INT ID [ NUM ] [ NUM ] .)
+    IF              reduce using rule 58 (declaration -> INT ID [ NUM ] [ NUM ] .)
+    WHILE           reduce using rule 58 (declaration -> INT ID [ NUM ] [ NUM ] .)
+    ID              reduce using rule 58 (declaration -> INT ID [ NUM ] [ NUM ] .)
+    }               reduce using rule 58 (declaration -> INT ID [ NUM ] [ NUM ] .)
+    =               shift and go to state 121
+
+
+state 119
+
+    (45) values -> NUM , . values
+    (45) values -> . NUM , values
+    (46) values -> . NUM
+    (47) values -> .
+
+    NUM             shift and go to state 114
+    INT             reduce using rule 47 (values -> .)
+    PRINT           reduce using rule 47 (values -> .)
+    READ            reduce using rule 47 (values -> .)
+    IF              reduce using rule 47 (values -> .)
+    WHILE           reduce using rule 47 (values -> .)
+    ID              reduce using rule 47 (values -> .)
+    }               reduce using rule 47 (values -> .)
+    ]               reduce using rule 47 (values -> .)
+
+    values                         shift and go to state 122
+
+state 120
+
+    (20) cmd_if_else -> IF condition { commands } ELSE { commands . }
+
+    }               shift and go to state 123
+
+
+state 121
+
+    (59) declaration -> INT ID [ NUM ] [ NUM ] = . d_values
+    (56) d_values -> . [ values ] d_values
+    (57) d_values -> .
+
+    [               shift and go to state 124
+    INT             reduce using rule 57 (d_values -> .)
+    PRINT           reduce using rule 57 (d_values -> .)
+    READ            reduce using rule 57 (d_values -> .)
+    IF              reduce using rule 57 (d_values -> .)
+    WHILE           reduce using rule 57 (d_values -> .)
+    ID              reduce using rule 57 (d_values -> .)
+    }               reduce using rule 57 (d_values -> .)
+
+    d_values                       shift and go to state 125
+
+state 122
+
+    (45) values -> NUM , values .
+
+    INT             reduce using rule 45 (values -> NUM , values .)
+    PRINT           reduce using rule 45 (values -> NUM , values .)
+    READ            reduce using rule 45 (values -> NUM , values .)
+    IF              reduce using rule 45 (values -> NUM , values .)
+    WHILE           reduce using rule 45 (values -> NUM , values .)
+    ID              reduce using rule 45 (values -> NUM , values .)
+    }               reduce using rule 45 (values -> NUM , values .)
+    ]               reduce using rule 45 (values -> NUM , values .)
+
+
+state 123
+
+    (20) cmd_if_else -> IF condition { commands } ELSE { commands } .
+
+    PRINT           reduce using rule 20 (cmd_if_else -> IF condition { commands } ELSE { commands } .)
+    READ            reduce using rule 20 (cmd_if_else -> IF condition { commands } ELSE { commands } .)
+    IF              reduce using rule 20 (cmd_if_else -> IF condition { commands } ELSE { commands } .)
+    WHILE           reduce using rule 20 (cmd_if_else -> IF condition { commands } ELSE { commands } .)
+    ID              reduce using rule 20 (cmd_if_else -> IF condition { commands } ELSE { commands } .)
+    }               reduce using rule 20 (cmd_if_else -> IF condition { commands } ELSE { commands } .)
+
+
+state 124
+
+    (56) d_values -> [ . values ] d_values
+    (45) values -> . NUM , values
+    (46) values -> . NUM
+    (47) values -> .
+
+    NUM             shift and go to state 114
+    ]               reduce using rule 47 (values -> .)
+
+    values                         shift and go to state 126
+
+state 125
+
+    (59) declaration -> INT ID [ NUM ] [ NUM ] = d_values .
+
+    INT             reduce using rule 59 (declaration -> INT ID [ NUM ] [ NUM ] = d_values .)
+    PRINT           reduce using rule 59 (declaration -> INT ID [ NUM ] [ NUM ] = d_values .)
+    READ            reduce using rule 59 (declaration -> INT ID [ NUM ] [ NUM ] = d_values .)
+    IF              reduce using rule 59 (declaration -> INT ID [ NUM ] [ NUM ] = d_values .)
+    WHILE           reduce using rule 59 (declaration -> INT ID [ NUM ] [ NUM ] = d_values .)
+    ID              reduce using rule 59 (declaration -> INT ID [ NUM ] [ NUM ] = d_values .)
+    }               reduce using rule 59 (declaration -> INT ID [ NUM ] [ NUM ] = d_values .)
+
+
+state 126
+
+    (56) d_values -> [ values . ] d_values
+
+    ]               shift and go to state 127
+
+
+state 127
+
+    (56) d_values -> [ values ] . d_values
+    (56) d_values -> . [ values ] d_values
+    (57) d_values -> .
+
+    [               shift and go to state 124
+    INT             reduce using rule 57 (d_values -> .)
+    PRINT           reduce using rule 57 (d_values -> .)
+    READ            reduce using rule 57 (d_values -> .)
+    IF              reduce using rule 57 (d_values -> .)
+    WHILE           reduce using rule 57 (d_values -> .)
+    ID              reduce using rule 57 (d_values -> .)
+    }               reduce using rule 57 (d_values -> .)
+
+    d_values                       shift and go to state 128
+
+state 128
+
+    (56) d_values -> [ values ] d_values .
+
+    INT             reduce using rule 56 (d_values -> [ values ] d_values .)
+    PRINT           reduce using rule 56 (d_values -> [ values ] d_values .)
+    READ            reduce using rule 56 (d_values -> [ values ] d_values .)
+    IF              reduce using rule 56 (d_values -> [ values ] d_values .)
+    WHILE           reduce using rule 56 (d_values -> [ values ] d_values .)
+    ID              reduce using rule 56 (d_values -> [ values ] d_values .)
+    }               reduce using rule 56 (d_values -> [ values ] d_values .)
+
+WARNING: 
+WARNING: Conflicts:
+WARNING: 
+WARNING: shift/reduce conflict for AND in state 78 resolved as shift
+WARNING: shift/reduce conflict for OR in state 78 resolved as shift
+WARNING: shift/reduce conflict for AND in state 79 resolved as shift
+WARNING: shift/reduce conflict for OR in state 79 resolved as shift

@@ -1,0 +1,14 @@
+{
+    Main
+
+    int num1 = 5
+    int i = 1
+    int num2 = 0
+
+    While (num1 > i) Do {
+
+        num2 = num2 +1
+        i = i + 1
+    }
+
+}

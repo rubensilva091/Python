@@ -1,0 +1,15 @@
+{
+    Main
+
+    int array1[10] = 5,10,15,20,25,30,35,40,45,50
+    int array2[2] = 50,80
+    int array3[10]
+    int x
+
+    x = 5 + 4
+
+    array3[1] = 5 + 5
+
+    Print(array3[1])
+
+}

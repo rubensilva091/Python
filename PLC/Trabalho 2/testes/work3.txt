@@ -1,0 +1,10 @@
+{
+    Main
+    int num1 = 4
+    int num2 = 6
+    int resultado 
+    
+    resultado = num1 + num2 + num1 + 4 - 6
+    Print(resultado)
+    
+}

@@ -1,0 +1,21 @@
+{
+    Main
+
+    int a 
+    int b
+    int c
+
+    Read a 
+    Read b
+    Read c
+
+    if (((a == 0) OR (b == 0) OR (c == 0)) OR ((a + b <= c) OR (a + c <= b) OR (b + c <= a)))
+    {
+        
+        Print (" NAO E TRIANGULO \n" )
+    }
+    else{
+    
+        Print ( " TRANGULO \n " )
+    } 
+}
