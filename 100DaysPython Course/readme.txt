@@ -4,7 +4,7 @@ skipped -> i literally CRTL-C CTRL-V
 
 skipped (advanced) -> i skipped every blog's module (just wactched the videos and read the docs)
 
-IMPOSSIBLE -> literally impossible, maybe the something is totally diferent
+IMPOSSIBLE -> literally impossible
 
 
 !!!!! -> i am prouud :)
