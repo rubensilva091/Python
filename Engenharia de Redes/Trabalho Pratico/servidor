@@ -1,0 +1,433 @@
+import threading
+import socket
+import json
+import os
+import sys
+import cv2
+import time
+import pickle
+import re
+from collections import defaultdict
+
+MAIN_PORT = 1111
+
+self_ip = ""
+video_buffers={}
+loaded_buffers = False
+streaming_clients = {}
+paths = {}
+
+connectionLogs = {}
+Connections = []
+CFG_PATH = "/home/core/TPRedes/cfg/"
+TopologyData ={}
+list_path_videos = []
+list_pop_server = []
+
+#Function to load videos to buffers
+#Using OpenCV to load the videos
+def load_videos_to_buffers():
+    global loaded_buffers
+
+    #in case the buffers are already loaded
+    if loaded_buffers:
+        return []
+    
+    buffers = {}
+
+    #Load Every video to a buffer
+    for path in list_path_videos:
+        cap = cv2.VideoCapture(path)
+        frames = []
+        
+        #In case the video is not opened
+        if not cap.isOpened():
+            continue
+        
+        #Read every frame of the video
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            #Encode the frame to JPEG to lower the size
+            _, encoded_frame = cv2.imencode('.jpg', frame, [cv2.IMWRITE_JPEG_QUALITY, 80])
+            frame_data = encoded_frame.tobytes()
+            frames.append(frame_data)
+        
+        cap.release()
+        buffers[path] = frames
+
+    loaded_buffers = True
+    return buffers
+
+#Function to send messages to the clients via UDP
+def send_message(message,ip, port=MAIN_PORT, PATH="nothing"):
+    #open a socket to send the message
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+
+        #The part of the sender throw a path
+        if PATH != "nothing":
+            message = "Servidor " + "Path:"+PATH + " " + message
+            final_message = message.encode()
+
+        #The part of the sender throw the normal way
+        else:
+            message ="Servidor "+ message 
+            final_message = message.encode()
+
+        #Send the message and add to the logs
+        sock.sendto(final_message, (ip, port))
+
+        print(f"Sent message to {ip}: {message}")
+        add_logs(ip,message, 1)
+
+#Function to listen to the messages always
+def listen_for_messages(porta=MAIN_PORT):
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+        sock.bind(("", porta))
+        while True:
+            data, address = sock.recvfrom(1024)
+            add_logs(address[0],data.decode(), 0)
+
+            parser_message(data.decode(),address[0])
+
+#Function to add logs to the connections
+#type 1 - Send
+#type 0 - Recv
+#type !1 and !0 - Other
+def add_logs(ip, data="", type=3):
+
+    #Check if the connection already exists
+    if ip not in connectionLogs:
+        connectionLogs[ip] = {
+            "logs": [],
+            "tag": "Unknow"
+        }
+    if type == 0:
+        tag, message = data.split(" ", 1)
+        try:
+            tag, id = tag.split(":", 1)
+        except:
+            pass
+        data = "Recv - " + message
+        connectionLogs[ip]["logs"].append(data)
+        connectionLogs[ip]["tag"] = tag
+    elif type == 1:
+        _, message = data.split(" ", 1)
+        data = "Send - " + message
+        connectionLogs[ip]["logs"].append(data)
+
+#Function to parse the messages
+def parser_message(message1,ip):
+
+    # Verify that is a valid "command message"
+    if(len(message1.split(" ",2)) != 3):
+        return
+
+    #Tag -> Client/Server/Node
+    #Command -> Request_PoP/PING/Request_Videos/Request_Stream/StreamLogOff/Request_Vizinho/Response_bfs
+    #Message -> The message itself (it can include other commands, but it will be parsed later on other nodes)
+    tag, command ,message = message1.split(" ", 2)
+    try:
+        tag, id = tag.split(":", 1)
+    except:
+        pass
+
+    if command == "Request_PoP":
+        send_pop(id,ip)
+    elif command == "PING":
+        send_pong(ip, message)
+    elif command == "Request_Videos":
+        send_list_videos(ip,id)
+    elif command =="Request_Stream":
+        handle_client_join(message,id ,ip)
+    elif command == "StreamLogOff":
+        try:
+            remove_client_from_stream(ip,id)
+        except:
+            path_finder(1) #if this happens, its the node dying
+    elif command == "Request_Vizinho":
+        send_neighbors(ip)
+    elif command == "Response_bfs":
+        extract_data_bfs(message)
+
+
+    if (re.search(r"Pathfinder", command) or re.search(r"Responde_bfs", command)or re.search(r"Path", command)):
+        return
+    print(message1)
+
+
+#Function to extract the data from the bfs
+def extract_data_bfs(message):
+    current_time, newpath = message.split(" ", 1)
+    fim = time.time() *1000
+    rtt = fim - float(current_time)  # RTT in ms
+
+    dest = newpath.split("/")[-1]
+
+    # If origin not in dictionary, create it
+    if dest not in paths.keys():
+        paths[dest] = {
+            "time": float(999999), 
+            "path": ""
+    }
+
+    # Check if new path is better
+    updated_path_hops = newpath.count("/")
+    old_hop_count = paths[dest]["path"].count("/")
+
+
+    #! TENDO EM CONTA QUE CORE É MUITO RAPIDO
+    #! VAMOS ARRENDEDAR O TEMPO PARA 1 ms
+
+    updated_rtt = round(rtt)
+    old_rtt = round(paths[dest]["time"])
+
+    print("updated_rtt "+ str(updated_rtt) + " old_rtt "+ str(old_rtt))
+    if old_rtt > updated_rtt:
+        paths[dest]["time"] = rtt
+        paths[dest]["path"] = newpath
+    elif old_rtt == updated_rtt:
+        if(updated_path_hops <= old_hop_count):
+            paths[dest]["time"] = rtt
+            paths[dest]["path"] = newpath
+
+#Function to send the neighbors saved on the topology
+def send_neighbors( ip):
+    for _, pop_data in TopologyData["Neighbors"].items():
+        try:
+            if ip in pop_data["self"]:
+                for node, node_ip in pop_data.items():
+                    if node != "self":  # Only send the node info, not self
+                        send_message(f"Response_Vizinho {node} {node_ip}", ip)
+        except:
+            print("Error sending on send_neighbors")
+    
+    send_message(f"Response_Vizinho done ", ip)        
+
+#Function to remove the client from the stream
+#This prevents the client from receiving the stream if he quits 'q'
+def remove_client_from_stream(ip,id):
+    for video_name in streaming_clients.keys():
+        if ip in streaming_clients[video_name]:
+            streaming_clients[video_name].remove(ip)
+    send_message("StreamLogOff done " +str(id),ip)
+
+#Function to handle the client join
+#This function adds the client to the stream
+#This function also sends the frame rate to the client
+def handle_client_join(message,id ,ip):
+    video_name = message
+    frame_rate =30
+    # Add the client to the list for the requested video
+    if video_name in streaming_clients:
+        if ip not in streaming_clients[video_name]:
+            streaming_clients[video_name].append(ip)
+            frame_rate = int(cv2.VideoCapture(video_name).get(cv2.CAP_PROP_FPS))
+    send_message("Response_Stream done:"+str(frame_rate)+" " +str(id),ip)
+    path_finder(1) #triggers the pathfinder to find the path to the new client
+
+#Function to send the list of videos
+def send_list_videos(ip,id):
+    if len(list_path_videos) == 0:
+        send_message("Response_Videos Empty",ip)
+    for video in list_path_videos:
+        try:
+            send_message("Response_Videos "+video,ip)
+        except:
+            print("Error sending video list")
+    send_message("Response_Videos done "+ str(id),ip)
+
+#Function to send the PONG message
+def send_pong(ip, message):
+    try:
+        send_message("PONG " + message,ip)
+    except:
+        print("Error sending PONG")
+
+#Function to send the PoPs saved on the topology
+def send_pop(id, ip):
+    for pop_name, pop_data in TopologyData["Points_of_Prensence"].items():
+        try:
+            if ip in pop_data["self"]:
+                for node, node_ip in pop_data.items():
+                    if node != "self":  # Only send the node info, not self
+                        send_message(f"Response_PoP {node} {node_ip}", ip)
+        except:
+            print("Error sending on send_pop")
+    
+    send_message(f"Response_PoP done {id}", ip)
+
+#Function to find the path of the videos on the server filesystem
+def find_path_videos():
+    for root, _, files in os.walk("/home/core/TPRedes/videos"):
+        for file in files:
+            if file.endswith(".mp4"):
+                path = os.path.join(root, file)
+                if path not in list_path_videos:
+                    list_path_videos.append(path)
+    return list_path_videos
+
+#Function to stream the video
+def stream_video(video_name):
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    global paths
+
+    frame_number = 0
+    frame_rate = int(cv2.VideoCapture(video_name).get(cv2.CAP_PROP_FPS))
+    try:
+        while True: #Sempre em loop
+            for frame in video_buffers[video_name]:
+
+                clients = streaming_clients[video_name]
+                frame_number += 1
+            
+                # Serializar frame (e numerar)
+                packet = {
+                    'frame_number': frame_number,#Frame number
+                    'frame': frame, #Frame
+                    'path': [] #Path to send the frame
+                }             
+
+                # Send frame to all clients
+                for client_address in clients:
+
+                    #Healing cathastrophic failure
+                    if client_address not in paths.keys():
+                        serialized_packet = pickle.dumps(packet)
+                        if len(serialized_packet) > 65507:
+                            break
+
+                        print(f"Sending frame {frame_number} DIRECTLY for {client_address}")
+                        server_socket.sendto(serialized_packet, (client_address, MAIN_PORT))
+                    else:
+                    #Send frame to the client through the path in overlay topology
+                        path = paths[client_address]["path"]
+                        print(f"Path to {client_address}: {path}")
+                        forward, new_pathing = path.split("/", 1)
+                        packet['path'] = new_pathing
+                        serialized_packet = pickle.dumps(packet)
+                        if len(serialized_packet) > 65507:
+                            break
+                        print(f"Sending frame {frame_number} for {client_address} throw TOPOLOGY")
+                        server_socket.sendto(serialized_packet, (forward, MAIN_PORT))
+
+                # Simulation of frame rate
+                time.sleep(1 / frame_rate)
+    except KeyboardInterrupt:
+        print("Streaming interruped manually!")
+    finally:
+        server_socket.close()
+
+
+#Function to get the server argument
+#Example:
+# python3 servidor.py <config_file>
+# python3 servidor.py topologia1
+def server_args():
+    if len(sys.argv) != 3:
+        print("\npython3 .../servidor <config_file> <ipServer>")
+        sys.exit(1)
+    config_file = sys.argv[1]
+    ipServer = sys.argv[2]  
+    if re.search( r"topologia", config_file):
+        try:
+            cfg_path_topologia = CFG_PATH + sys.argv[1] +".json"
+            return (ipServer,json.load(open(cfg_path_topologia)))
+        except:
+            print("Ficheiro não encontrado")
+            sys.exit(1)
+    else:
+        print("O Config file tem de ser 'Topologia'!!")
+        sys.exit(1)
+
+#Function to find the server PoPs
+def server_pop():
+    global self_ip
+    for _, data in TopologyData["Points_of_Prensence"].items():
+        if self_ip in data["self"]:
+
+            # Add all non-self IPs from this node
+            for key, value in data.items():
+                if key != "self":  # Skip the self list
+                    list_pop_server.append(value)
+        
+
+#Function to find the path in topology by using BFS
+#This function is called every 5 seconds
+#Pathfinder:next_ip:visited_:currentpath_:destination_
+def path_finder(flag = 0):
+    i = 0
+    while True:
+        for _,clients in streaming_clients.items():
+            for destino in clients:
+                for forward_ip in list_pop_server:
+                    Command = "Pathfinder:"
+
+                    next_ip = "next_"+forward_ip
+
+                    visited = ":visited_"
+                    current = ":currentpath_"
+                    destination = ":destination_"+destino
+
+                    Command = Command + next_ip + visited + current + destination
+                    send_message(Command + " cliente", forward_ip)
+
+        #this is the flag to stop the pathfinder, used when a new client joins
+        if flag == 1:
+            break
+        time.sleep(10)
+        i+=1
+        if i%2 == 0 :
+            paths.clear()
+
+
+#Function to load the streams to the buffers
+def start_stream():
+    print("Loading the Videos to the buffers, please wait!")
+    global loaded_buffers
+
+    #In case the buffers are already loaded
+    if loaded_buffers:
+        return 
+    
+    global video_buffers
+    if len(video_buffers) == 0:
+        aux = load_videos_to_buffers()
+        video_buffers = aux
+
+    print("Videos loaded successfully!")
+    print("Inicializing Streams, please wait!")
+
+    #Start the streams for every video in a different thread
+    for video_name in video_buffers:
+        streaming_clients[video_name] = []
+        thread_stream = threading.Thread(target=stream_video, args=(video_name,))
+        thread_stream.daemon = True
+        thread_stream.start()
+    print("Streams started successfully!")
+
+#Main Script
+thread_listener = threading.Thread(target=listen_for_messages)
+thread_listener.daemon = True
+thread_listener.start()
+
+self_ip,TopologyData = server_args()
+
+#Loading every data
+list_path_videos=find_path_videos()
+server_pop()
+start_stream()
+
+thread_path_finder = threading.Thread(target=path_finder)
+thread_path_finder.daemon = True
+thread_path_finder.start()
+
+#Keep the server running
+while True:
+    time.sleep(1)
+    pass
+
+
+

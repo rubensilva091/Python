@@ -1,0 +1,271 @@
+import socket
+import threading
+import re
+import sys
+import time
+import pickle
+import signal
+
+MAIN_PORT = 1111
+Neighbor_logs = {}
+Neighbours = []
+Server =""
+
+def signal_handler(sig, frame):
+    print("\nShutdown message sending...")
+    # Your cleanup code here, e.g.:
+    send_message("StreamLogOff node", Server)
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+
+#Function to send a message
+def send_message(message,ip, porta=MAIN_PORT, PATH ="nothing"):
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+
+            #The part of the sender throw a path
+            if PATH != "nothing":
+                 #o primeiro será sempre o melhor path
+                message = "Node " + "Path:"+PATH + " " + message
+                final_message = message.encode()
+
+            #The part of the sender throw the normal way
+            else:
+                message ="Node "+ message 
+                final_message = message.encode()
+
+            #Send the message and add to the logs
+            sock.sendto(final_message, (ip, porta))
+            add_logs(ip,message, 1)
+    except:
+        print("Error sending message")
+
+#Function to listen messages
+def listen_messages(porta=MAIN_PORT):
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+        sock.bind(("", porta))     
+        while True:
+            dados, endereco = sock.recvfrom(65507) 
+
+            #in case of a stream packet is utf-8
+            try:
+                 #This will block if the message is not utf-8
+                add_logs(endereco[0],dados.decode(), 0)
+                parser_message(dados.decode(),endereco[0])
+            
+            #in case of a stream packet is not utf-8 (is a stream packet)
+            except:
+                try:
+                    receive_n_send_streamPacket(dados, endereco[0])
+                except:
+                    print("Error receiving stream packet")
+
+#Function to receive and send a stream packet throw the network
+def receive_n_send_streamPacket(packet,ip):
+
+    frame_data = pickle.loads(packet)
+
+    path = frame_data['path']
+
+    # in case is the last node
+    try:
+        forward, new_pathing = path.split("/", 1)
+    except:
+        forward = path
+        new_pathing = ""
+
+    frame_data['path'] = new_pathing
+    serialized_packet = pickle.dumps(frame_data)
+    node_packet_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    if len(serialized_packet) > 65507:
+        return
+    node_packet_socket.sendto(serialized_packet, (forward, MAIN_PORT))
+
+    print("Resent frame nr: " + str(frame_data['frame_number']))
+    add_logs(ip, "Resent frame nr: " + str(frame_data['frame_number']), 0)
+
+#Function to parse the message
+def parser_message(message1,ip):
+
+    # Verify that is a valid "command message"
+    if(len(message1.split(" ",2)) != 3):
+        return
+
+    #Tag -> Client/Server/Node
+    #Command -> Request_PoP/PING/Request_Videos/Request_Stream/StreamLogOff/Request_Vizinho/Response_bfs
+    #Message -> The message itself (it can include other commands, but it will be parsed later on other nodes)
+    tag, command ,message = message1.split(" ", 2)
+
+    #in case of the tag got the id
+    #this means that is a important message
+    #that needs response
+    #mimic TCP
+    try:
+        tag, id = tag.split(":", 1)
+    except:
+        pass
+    if command == "PING":
+        send_pong(ip, message)
+    if re.search(r"Path:", command):
+        extract_pathing(command, message)
+    if command == "Response_Vizinho":
+        receive_neighbors(message)
+    elif re.search(r"Pathfinder", command):
+        pathfinder(ip,command,message)
+
+    if (re.search(r"Pathfinder", command) or re.search(r"Responde_bfs", command)or re.search(r"Path", command)):
+        return
+    print(message1)
+
+#Function to keep the BFS going throw the network
+#This function records the path of the packet and sends it to the next node
+def pathfinder(ip,command, message):
+    # Parse the message
+    suffix = command.split("Pathfinder:")[1]
+    next_part, visited_part, currentpath_part, destination_part = suffix.split(':')
+    
+    # Process each section
+    next_ips = next_part.split('next_')[1].split('/')
+    visited_ips = visited_part.split('visited_')[1].split('/')
+    current_path = currentpath_part.split('currentpath_')[1].split('/')
+    destination = destination_part.split('destination_')[1]
+
+    # Check if destination reached
+    if destination in current_path:
+        print(f"Destination {destination} reached!")
+        return
+
+    # Get current IP and update packet's path
+    now_ip = next_ips.pop(0)
+    if now_ip == '':
+        now_ip = next_ips.pop(0)
+    
+    current_path.append(now_ip)  # Add to THIS packet's path
+    visited_ips.append(now_ip)   # Mark as globally visited
+    
+    # For each neighbor of current node
+    for next_ip in Neighbours:
+        if next_ip not in visited_ips and next_ip != Server:
+            # Create a new message with:
+            # - next: just this one neighbor
+            # - visited: all visited nodes so far
+            # - currentpath: this packet's path
+            message = f"Pathfinder:next_{next_ip}:visited_{'/'.join(visited_ips)}:currentpath_{'/'.join(current_path)}:destination_{destination}"
+            send_message(message + " node", next_ip)        
+
+#Function to receive the neighbors
+def receive_neighbors(message):
+    name,ip2 = message.split(" ", 1)
+    if ip2 not in Neighbor_logs.keys() and name != "done":
+        tag = "Node"
+        if name[0] == 'n':
+            tag = "Node"
+        elif name[0] == 's':
+            tag = "Servidor"
+        elif name[0] == 'c':
+            tag = "Cliente"
+        Neighbor_logs[ip2] = {
+            "logs": [],
+            "tag": tag
+            }
+    if ip2 not in Neighbours and name != "done":
+        Neighbours.append(ip2)
+
+#Function to extract the pathing from the message and keep the pathing going
+#This function will send the message to the next node in the path
+def extract_pathing(command, message):
+    _, pathing = command.split(":", 1)
+    try:
+        forward, new_pathing = pathing.split("/",1)
+        send_message(message, forward, PATH=new_pathing)
+    except:
+        forward = pathing
+        send_message(message, forward)
+
+#Function to send a PONG message
+def send_pong(ip, message):
+    try:
+        send_message("PONG " + message,ip)
+    except:
+        print("Error sending PONG")
+    vizinhos = []
+    for i in range(1, len(sys.argv)):
+        vizinhos.append(sys.argv[i])
+        Neighbor_logs[sys.argv[i]] = {
+            "logs": [],
+            "tag": "Unknow"
+        }
+    return vizinhos
+
+#Function to add logs to the connections
+#type 1 - Send
+#type 0 - Recv
+#type !1 and !0 - Other
+def add_logs(ip, data="", type=3):
+
+    #Check if the connection already exists
+    if ip not in Neighbours:
+        Neighbours.append(ip)
+    if ip not in Neighbor_logs:
+        Neighbor_logs[ip] = {
+            "logs": [],
+            "tag": "Unknow"
+        }
+    if type == 0:
+        tag, message = data.split(" ", 1)
+        data = "Recv - " + message
+        Neighbor_logs[ip]["logs"].append(data)
+        Neighbor_logs[ip]["tag"] = tag
+    elif type == 1:
+        _, message = data.split(" ", 1)
+        data = "Send - " + message
+        Neighbor_logs[ip]["logs"].append(data)
+
+#function to receive the server
+#Example: python3 node.py <serverIP>
+#python3 node.py 10.0.0.20
+def server_arg():
+    if len(sys.argv) < 2:
+        print("Server IP MISSING")
+        sys.exit(1)
+    elif len(sys.argv) > 2:
+        print("A lot of arguments")
+        sys.exit(1)
+    Server = sys.argv[1]
+    Neighbor_logs[sys.argv[1]] = {
+        "logs": [],
+        "tag": "Unknow"
+    }
+    return Server
+
+def ask_PoPs():
+    try:
+        send_message("Request_Vizinho node", Server)
+        print("All PoPs asked")
+    except:
+        print("Error asking PoPs")
+
+
+def data_from_server():
+    print("Waiting for Server Data...")
+    ask_PoPs()
+    time.sleep(0.5)
+
+try:
+
+    # Estar sempre a ouvir
+    thread_listener = threading.Thread(target=listen_messages)
+    thread_listener.daemon = True
+    thread_listener.start()
+
+    Server = server_arg()
+    data_from_server()
+    # Manter o programa a correr
+    while True:
+        time.sleep(1)
+        input("Press Enter to continue...")
+        pass
+except:
+    send_message("StreamLogOff node", Server)
+

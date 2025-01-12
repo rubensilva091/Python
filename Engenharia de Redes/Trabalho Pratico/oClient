@@ -1,0 +1,561 @@
+import socket
+import threading
+import sys
+import time
+import re
+import cv2
+import numpy as np
+import pickle
+import os
+import signal
+
+# Set the DISPLAY environment variable
+os.environ["DISPLAY"] = ":0.0"
+
+MAIN_PORT = 1111
+
+video_buffer = []
+frame_count = 1
+first_frame = -1
+frame_expected = 1
+frame_rate = 30
+
+connectionLogs = {}
+Connections = []
+Server = ""
+PendingMessages = {}
+Message_id = 0
+network_metrics = {}
+available_videos = []
+
+def signal_handler(sig, frame):
+    print("\nShutdown message sending...")
+    # Your cleanup code here, e.g.:
+    send_message("StreamLogOff client", Server, important=True)
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+
+# Function to restart the application
+def restart_application():
+    """Restart the entire application by killing the current process."""
+    print("Restarting application...")
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
+
+# Function to send a message
+def send_message(message,ip, porta=MAIN_PORT, important=False, PATH ="nothing"):
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+        if PATH != "nothing":
+             #o primeiro será sempre o melhor path
+            message = "Path:"+PATH + " " + message
+
+        if important==True:
+            global Message_id
+            Message_id += 1
+            message ="Cliente:" + str(Message_id) +" "+ message
+            add_pending_response_message(ip, message, Message_id)
+        else:
+            message = "Cliente " + message
+        final_message = message.encode()
+        sock.sendto(final_message, (ip, porta))
+        add_logs(ip,message, 1)
+
+# Function to listen messages
+def listen_messages(porta=MAIN_PORT):
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+        sock.bind(("", porta))
+        
+        while True:
+            dados, endereco = sock.recvfrom(65507) 
+
+            #in case of a stream packet is utf-8
+            try:
+                add_logs(endereco[0],dados.decode(), 0)
+                parser_message(dados.decode(),endereco[0])
+            
+            #in case of a stream packet is not utf-8 (is a stream packet)
+            except:
+                receive_video(dados)
+
+# Function to add a message to the pending messages
+# This is used to resend important messages
+# mimic the TCP behavior    
+def add_pending_response_message(ip, message, id):
+    tag, message = message.split(" ", 1)
+    try:
+        tag , id = tag.split(":", 1)
+    except:
+        pass
+    if id not in PendingMessages:
+        PendingMessages[id] = {
+            "ip" : ip,
+            "message" : message
+        }
+    else:
+        add_logs(ip, "Error adding the message : " + message + " ID: " + str(id))
+
+# Function to remove a message from the pending messages
+def remove_pending_response_message(id):
+    try :
+        if id in PendingMessages.keys():
+            del PendingMessages[id]
+    except:
+        print("Error removing the message with ID: " + str(id))
+
+# Function to get the server IP from the arguments
+def server_arg():
+    if len(sys.argv) < 2:
+        print("Server IP missing")
+        sys.exit(1)
+    elif len(sys.argv) > 2:
+        print("A lot of arguments")
+        sys.exit(1)
+    Server = sys.argv[1]
+    connectionLogs[sys.argv[1]] = {
+        "logs": [],
+        "tag": "Unknow"
+    }
+    return Server
+
+#Function to re-send the important messages
+def reRequest():
+    while True:
+        time.sleep(5) #Wait 5 seconds before re-sending the messages
+        lista_atual = list(PendingMessages.items())
+        for (id, data) in lista_atual:
+            ip = data["ip"]
+            message = data["message"]
+            send_message(message, ip, important=True)
+
+            #Changing the message id
+            remove_pending_response_message(id)
+
+# Function to measure the network periodically
+# This function sends a PING message to all the connections
+# and calculates the RTT
+# The RTT is stored in the network_metrics dictionary
+# 5 seconds interval
+def measure_network_periodically(intervalo=5):
+    while True:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as cliente_socket:
+            cliente_socket.settimeout(1)  # Timeout 1 second
+            for ip in Connections:
+                try:
+                    if ip == Server:
+                        continue
+                    # Send a PING message to the connection
+                    final_message = "PING " + str(time.time())
+                    send_message(final_message, ip)
+                except:
+                    print("Error sending PING to " + ip)
+                    continue
+        
+        # Wait for the interval
+        time.sleep(intervalo)
+
+# Function to show the server
+def show_server():
+    if Server == "":
+        print("No Server Connection at Moment\n")
+        return
+    packet_loss = (1-(frame_count/frame_expected))*100
+    print("Server: " + Server + " - Logs: " + str(len(connectionLogs[Server]["logs"])) + " - Packet Loss: " + str(packet_loss) + "%\n")
+
+# Function to display the connections
+def display_connections():
+    if len(Connections) == 0 or (len(Connections) == 1 and Connections[0] == Server):
+        print("Sem Points of Presence\n")
+        return
+
+    # Cabeçalho da tabela
+    header = f"{'#':<3} | {'PoPs':<20} | {'Logs':<5} | {'RTT':<5} | {'TAG'}"
+    separator = "-" * len(header)
+
+    print(header)
+    print(separator)
+    
+    i = 1
+    for c in Connections:
+        if c == Server:
+            continue
+        logs_count = len(connectionLogs[c]["logs"]) 
+        tag = connectionLogs[c]["tag"]
+        tag_display = "?"  
+        if tag == "Node":
+            tag_display = "N"
+        elif tag == "Servidor":
+            tag_display = "S"
+        elif tag == "Cliente":
+            tag_display = "C"
+        print(f"{i:<3} | {c:<20} | {logs_count:<6}| {network_metrics.get(c, 'N/A'):<5} | {tag_display} ")
+        i += 1
+    print()
+
+# Function to add logs to the connections
+#type 1 - Send
+#type 0 - Recv
+#type !1 and !0 - Other
+def add_logs(ip, data="", type=3):
+    if ip not in Connections:
+        Connections.append(ip)
+    if ip not in connectionLogs:
+        connectionLogs[ip] = {
+            "logs": [],
+            "tag": "Unknow"
+        }
+    if type == 0:
+        tag, message = data.split(" ", 1)
+        try:
+            tag, id = tag.split(":", 1)
+        except:
+            pass
+        data = "Recv - " + message
+        connectionLogs[ip]["logs"].append(data)
+        connectionLogs[ip]["tag"] = tag
+    elif type == 1:
+        _, message = data.split(" ", 1)
+        data = "Send - " + message
+        connectionLogs[ip]["logs"].append(data)
+
+#Function to parse the message
+def parser_message(message,ip):
+
+    # Verify that is a valid "command message"
+    if(len(message.split(" ",2)) != 3):
+        return
+    
+    #Tag -> Client/Server/Node
+    #Command -> Request_PoP/PING/Request_Videos/Request_Stream/StreamLogOff/Request_Vizinho/Response_bfs
+    #Message -> The message itself (it can include other commands, but it will be parsed later on other nodes)
+    _, command ,message = message.split(" ", 2)
+
+    if command == "Response_PoP":
+        receive_pop(message)
+    
+    elif command == "PONG":
+        calcular_metricas_rede(message,ip)
+    
+    elif command == "Response_Videos":
+        receive_list_videos(message)
+    elif command == "Response_Stream":
+        response_stream(message)
+        
+    elif command == "StreamLogOff":
+        streamlogoff(message)
+    elif re.search(r"Pathfinder", command):
+        pathfinder(command,message)
+        
+#Function to Re-send back to the server the path
+def pathfinder(command,message):
+    # Parse the message
+    suffix = command.split("Pathfinder:")[1]
+    next_part, visited_part, currentpath_part, destination_part = suffix.split(':')
+    
+    # Process each section
+    next_ips = next_part.split('next_')[1].split('/')
+    visited_ips = visited_part.split('visited_')[1].split('/')
+    current_path = currentpath_part.split('currentpath_')[1].split('/')
+    destination = destination_part.split('destination_')[1]
+
+
+    #inverse the path and add the Server
+    server_path = current_path[::-1]
+    server_path.append(Server)
+
+    packet_path = ""
+    for ips in server_path:
+        packet_path += ips + "/"
+    packet_path = packet_path[:-1]
+
+    current_time = str(time.time() * 1000)
+
+    forward, new_pathing = packet_path.split("/", 1)
+
+    #se a minha letra for / apagar la
+    if forward[0] == "/":
+        forward = forward[1:]
+
+    current_path.pop(0)
+    current_path = current_path +[next_ips[0]] 
+
+    #FALTA ENVIAR O PATH PARA TRAS e o SEU TIME
+    send_message("Response_bfs "+ current_time +" "+ '/'.join(current_path), forward, PATH=new_pathing)
+
+#Function to handle the stream logoff
+def streamlogoff(message):
+    try:
+        command, id = message.split(" ", 1)
+        if command == "done":
+            remove_pending_response_message(id)
+            video_buffer.clear() # Clear the video buffer for the next stream
+    except:
+        pass
+
+#Function to handle the response of the stream
+def response_stream(message):
+    try :
+        command, id = message.split(" ", 1)
+        try:
+            command2, frame_rate_aux = command.split(":", 1)
+            if command2 == "done":
+                remove_pending_response_message(id)
+                global frame_rate
+                frame_rate = int(frame_rate_aux)
+        except:
+            pass
+    except:
+        pass
+
+#Function to receive the list of videos
+def receive_list_videos(message):
+    try :
+        command, id = message.split(" ", 1)
+        if command == "done":
+            remove_pending_response_message(id)
+        if command == "Empty":
+            return
+    except:
+        pass
+    if message not in available_videos and not re.match(r'^done\b', message):
+        available_videos.append(message)
+
+#Function to calculate the network metrics
+def calcular_metricas_rede(message,ip):
+    fim = time.time()
+    rtt = (fim - float(message)) * 1000  # RTT ms
+    rtt = round(rtt, 2)
+    network_metrics[ip] = rtt
+
+#Function to receive the PoPs
+def receive_pop(message):
+    name,ip2 = message.split(" ", 1)
+    if ip2 not in connectionLogs.keys() and name != "done":
+        tag = "Node"
+        if name[0] == 'n':
+            tag = "Node"
+        elif name[0] == 's':
+            tag = "Servidor"
+        elif name[0] == 'c':
+            tag = "Cliente"
+        connectionLogs[ip2] = {
+            "logs": [],
+            "tag": tag
+            }
+    if ip2 not in Connections and name != "done":
+        Connections.append(ip2)
+    if name == "done":
+        id = ip2
+        remove_pending_response_message(id)
+
+#Function to clear the screen
+def screen_clear():
+    print("\033[H\033[J")
+
+#Function to receive the video
+def receive_video(packet):
+    global frame_count, frame_expected, first_frame
+
+    frame_data = pickle.loads(packet)
+
+    # First frame
+    if first_frame == -1:
+        first_frame = frame_data['frame_number']
+        frame_count = frame_data['frame_number']-1
+
+    frame_expected = max(frame_expected,frame_data['frame_number'])
+    frame_count += 1
+    encoded_frame = frame_data['frame']
+
+    video_buffer.append(encoded_frame)    
+    add_logs(Server, "Recebeu frame de video nr: " + str(frame_data['frame_number']), 0)
+
+# Menus
+def menu_cli():
+    opcao = 9999
+    while opcao !=0:
+        data_from_server()
+        screen_clear()
+        show_server()
+        display_connections()
+        print("----------Menu Principal----------\n")
+        print("1 - AssistirStream")
+        print("2 - Enviar mensagem")
+        print("3 - Ver Trafego com o Servidor")
+        print("4 - Ver Trafego com PoPs")
+        print("5 - Refresh Menu")
+        print()
+        print("\n0 - Sair")
+        opcao = int(input("\nEscolha uma opção: "))
+
+        if opcao == 2:
+            menu_cli_enviar_mensagem()
+        elif opcao == 3:
+            menu_cli_ver_trafego_server()
+        elif opcao == 4:
+            menu_cli_ver_trafego()
+        elif opcao == 1:
+            menu_cli_ver_stream()
+
+def menu_cli_ver_stream():
+    n = 9999
+    while n != 0:
+        screen_clear()
+        print("----------Menu Assistir Stream----------\n")
+        print("Escolha o video que deseja assistir: ")
+        i=1
+        for video in available_videos:
+            print(str(i)+" -> "+video)
+            i+=1
+        
+        print("\n0 - Voltar")
+        n = int(input("\nEscolha uma opção: "))
+        if n == 0:
+            break
+        if n <= len(available_videos):
+            try:
+                send_message("Request_Stream "+available_videos[n-1], Server, important=True)
+                break
+            except:
+                print("Erro ao pedir stream ao Servidor")
+        else:
+            print("Opção inválida. Tente novamente.")
+            time.sleep(1)
+
+def menu_cli_enviar_mensagem():
+    msn = input("Mensagem para o Servidor: ")
+    try:
+        send_message(msn, Server)
+    except:
+        print("Erro ao enviar mensagem ao Servidor")
+
+def menu_cli_pedir_pops():
+    try:
+        send_message("Request_PoP cliente", Server, important=True)
+    except:
+        print("Erro ao pedir PoPs ao Servidor")
+
+def menu_cli_pedir_lista_videos():
+    try:
+        send_message("Request_Videos cliente", Server, important=True)
+    except:
+        print("Erro ao pedir lista de videos ao Servidor")
+
+def menu_cli_ver_trafego_server():
+    screen_clear()
+        
+    try:
+        print("Trafego com o Servidor "+Server+ "\n")
+        for log in connectionLogs[Server]["logs"]:
+            print(log)
+    except:
+        screen_clear()
+        print("Erro ao mostrar trafego do Servidor " + Server)
+    input("\nPressione Enter para continuar para voltar...")
+
+def menu_cli_ver_trafego():
+    conexao = int(input("Escolha o nr do IP da conexao: "))
+    screen_clear()
+    if conexao <= len(Connections) and conexao > 0:
+        
+        try:
+            print("Trafego com o conexao "+Connections[conexao-1]+ "\n")
+            for log in connectionLogs[Connections[conexao-1]]["logs"]:
+                print(log)
+        except:
+            screen_clear()
+            print("Erro ao mostrar trafego de " + Connections[conexao-1])
+    else:
+        print("conexao não existe")
+    input("\nPressione Enter para continuar para voltar...")
+
+def data_from_server():
+    menu_cli_pedir_pops()
+    menu_cli_pedir_lista_videos()
+    print("A carregar dados do servidor...")
+    time.sleep(0.5)
+
+
+def watch_stream():
+    global frame_rate
+    
+    paused = False
+
+    while True:
+        frame_interval = 1 / frame_rate  # Intervalo entre frames para 30 FPS
+        if paused:
+            print("Streaming pausado. Pressione 'p' para retomar.")
+            time.sleep(1)  # Evita sobrecarregar o loop durante a pausa
+            if cv2.waitKey(1) & 0xFF == ord('p'):
+                paused = False  # Retomar streaming
+            continue
+
+        if len(video_buffer) < 1:
+            time.sleep(2)  # Espera por frames se o buffer estiver vazio
+            continue
+        else:
+            try:
+                frame_encoded = video_buffer.pop(0)
+                frame = cv2.imdecode(np.frombuffer(frame_encoded, np.uint8), cv2.IMREAD_COLOR)
+                if frame is None:
+                    continue
+
+                start_time = time.time()
+                try:
+                    cv2.imshow('Video Stream', frame)
+                except Exception as e:
+                    print(f"Erro ao mostrar o vídeo: {e}")
+
+                # Pausar o streaming ao pressionar 'p'
+                if cv2.waitKey(1) & 0xFF == ord('p'):
+                    paused = True
+
+                # Parar o streaming ao pressionar 'q'
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+
+                # Garantir que os frames sejam exibidos no intervalo correto
+                time.sleep(frame_interval)
+
+            except KeyboardInterrupt:
+                print("Streaming interrompido manualmente!")
+                break
+            except Exception as e:
+                print(f"Error: {e}")
+
+    cv2.destroyAllWindows()
+    send_message("StreamLogOff client", Server, important=True)
+    frame_rate = 30 # Resetar o frame rate para 30 FPS
+    restart_application()
+
+    
+# Signal handler if the user presses CTRL+C
+signal.signal(signal.SIGINT, signal_handler)    
+
+try:
+    # Main Script
+    Server = server_arg()
+
+    thread_listener = threading.Thread(target=listen_messages)
+    thread_listener.daemon = True
+    thread_listener.start()
+
+    thread_reRequest = threading.Thread(target=reRequest)
+    thread_reRequest.daemon = True
+    thread_reRequest.start()
+
+    thread_ping = threading.Thread(target=measure_network_periodically)
+    thread_ping.daemon = True
+    thread_ping.start()
+
+    stream = threading.Thread(target=watch_stream)
+    stream.daemon = True
+    stream.start()
+
+    
+    #main menu keep running
+    menu_cli()
+
+    #This will send a message to the server to logoff the stream in case of crash or manual shutdown
+finally:
+    send_message("StreamLogOff client", Server, important=True)
